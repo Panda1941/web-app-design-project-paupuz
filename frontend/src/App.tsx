@@ -4,6 +4,7 @@ import { Panel } from './components/common'
 import { ChampionsPage } from './pages/ChampionsPage'
 import { ChampionPage } from './pages/ChampionPage'
 import { BuildPage } from './pages/BuildPage'
+import { CommentPage } from './pages/CommentPage'
 import { LoginPage, RegisterPage } from './pages/AuthPages'
 
 export default function App() {
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/" element={<ChampionsPage />} />
         <Route path="/champions/:championId" element={<ChampionPage />} />
         <Route path="/champions/:championId/builds/:buildId" element={<BuildPage />} />
+        <Route path="/champions/:championId/builds/:buildId/comments/:commentId" element={<CommentPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route

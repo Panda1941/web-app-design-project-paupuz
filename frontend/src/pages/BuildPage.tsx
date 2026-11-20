@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ChevronRight, MessageSquare, Pencil, Send, Trash2 } from 'lucide-react'
+import { ChevronRight, Link2, MessageSquare, Pencil, Send, Trash2 } from 'lucide-react'
 import { api, type Build, type Comment, type Paged } from '../api'
 import { useAuth } from '../auth'
 import { useToast } from '../toast'
@@ -228,11 +228,22 @@ function Comments({ championId, buildId }: { championId: number; buildId: number
               <div className="comment-head">
                 <span className="comment-avatar">{comment.authorUsername[0].toUpperCase()}</span>
                 <strong>{comment.authorUsername}</strong>
-                <span className="muted">
+                <Link
+                  to={`/champions/${championId}/builds/${buildId}/comments/${comment.id}`}
+                  className="muted comment-date"
+                  title="Open this comment"
+                >
                   {formatDate(comment.createdAt)}
                   {comment.updatedAt !== comment.createdAt && ' (edited)'}
-                </span>
+                </Link>
                 <span className="comment-actions">
+                  <Link
+                    to={`/champions/${championId}/builds/${buildId}/comments/${comment.id}`}
+                    className="icon-button"
+                    title="Link to this comment"
+                  >
+                    <Link2 size={14} />
+                  </Link>
                   {user?.id === comment.authorId && (
                     <button className="icon-button" onClick={() => setEditing(comment)} title="Edit">
                       <Pencil size={14} />

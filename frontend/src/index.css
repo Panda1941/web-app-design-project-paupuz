@@ -781,6 +781,19 @@ h3.panel-title {
   border: 1px solid #000;
 }
 
+.comment-date:hover {
+  color: var(--link);
+}
+
+.comment-single {
+  border-bottom: none;
+  margin-bottom: 8px;
+}
+
+.comment-single .comment-text {
+  font-size: 17px;
+}
+
 .comment-actions {
   margin-left: auto;
   display: flex;
