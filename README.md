@@ -149,7 +149,7 @@ Sistema patalpinta Railway platformoje (projektas `lol-builds`), kur abi dalys d
 
 | Dalis | Adresas | Vykdymo aplinka |
 | --- | --- | --- |
-| Kliento aplikacija | https://web-production-45bfe930.up.railway.app | Railway paslauga `web`: sukompiliuoti React failai, aptarnaujami Caddy serverio |
+| Kliento aplikacija | https://lol-builds.up.railway.app | Railway paslauga `web`: sukompiliuoti React failai, aptarnaujami Caddy serverio |
 | REST API | https://api-production-3b89593d.up.railway.app | Railway paslauga `api`: ASP.NET Core (.NET 10, Kestrel) |
 | API dokumentacija | https://api-production-3b89593d.up.railway.app/swagger | Swagger UI |
 | Duomenų bazė | – | SQLite failas `/data/lolbuilds.db` Railway tome (volume), prijungtame prie `api` paslaugos |
