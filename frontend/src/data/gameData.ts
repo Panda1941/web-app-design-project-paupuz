@@ -11,8 +11,8 @@ export const POSITIONS: string[] = catalog.positions
 // Champion portraits that ship with the frontend (in /public/images/champions).
 // Used by the champion form so an admin can pick an image instead of typing a URL.
 export const CHAMPION_IMAGES: string[] = [
-  'Ahri', 'Annie', 'Darius', 'Ezreal', 'Garen', 'Jinx', 'Katarina', 'LeeSin',
-  'Leona', 'Lux', 'Malphite', 'MissFortune', 'Teemo', 'Thresh', 'Yasuo', 'Zed',
+  'Ahri', 'Annie', 'Caitlyn', 'Darius', 'Diana', 'Ezreal', 'Fiora', 'Garen', 'Jhin', 'Jinx', 'Kaisa',
+  'Katarina', 'LeeSin', 'Leona', 'Lux', 'Malphite', 'MissFortune', 'Teemo', 'Thresh', 'Viktor', 'Yasuo', 'Zed',
 ].map((name) => `/images/champions/${name}.png`)
 
 const itemById = new Map(ITEMS.map((item) => [item.id, item]))

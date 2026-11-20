@@ -2114,7 +2114,7 @@ npm run dev
 
 Kliento aplikacija pasiekiama adresu `http://localhost:5173`. API adresas nurodomas aplinkos kintamuoju `VITE_API_URL` (numatytasis `http://localhost:5224`).
 
-- Duomenų bazės failas `lolbuilds.db` sukuriamas ir užpildomas automatiškai. Norint atkurti pradinius duomenis, failą užtenka ištrinti.
+- Duomenų bazės failas `lolbuilds.db` sukuriamas ir užpildomas prasmingais pradiniais duomenimis automatiškai: 8 naudotojai, 16 čempionų, 28 build’ai ir 55 komentarai. Norint atkurti pradinius duomenis, failą užtenka ištrinti.
 - OpenAPI specifikacija ir Swagger UI: `http://localhost:5224/swagger`.
 - Postman užklausų rinkinys su testais: `postman/LolBuilds.postman_collection.json`. Paleidimas: `postman collection run postman/LolBuilds.postman_collection.json`.
 

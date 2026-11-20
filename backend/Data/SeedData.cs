@@ -51,7 +51,20 @@ public static class SeedData
             "A proud and noble warrior, Garen fights as one of the Dauntless Vanguard. He is popular among his fellows and respected well enough by his enemies.", now.AddDays(-26));
         Champion ezreal = Champion("Ezreal", "the Prodigal Explorer",
             "A dashing adventurer, unknowingly gifted in the magical arts, Ezreal raids long-lost catacombs, tangles with ancient curses and overcomes seemingly impossible odds with ease.", now.AddDays(-26));
-        db.Champions.AddRange(ahri, jinx, yasuo, leeSin, malphite, lux, darius, thresh, garen, ezreal);
+        Champion caitlyn = Champion("Caitlyn", "the Sheriff of Piltover",
+            "Renowned as its finest peacekeeper, Caitlyn Kiramman is also Piltover's best shot at ridding the city of its elusive criminal elements.", now.AddDays(-25));
+        Champion jhin = Champion("Jhin", "the Virtuoso",
+            "Jhin is a meticulous criminal psychopath who believes murder is art. Every shot from his gun is a performance for an audience only he can see.", now.AddDays(-25));
+        Champion kaisa = Champion("Kai'Sa", "Daughter of the Void",
+            "Claimed by the Void when she was only a child, Kai'Sa managed to survive through sheer tenacity and strength of will, and became a deadly hunter.", now.AddDays(-24), "Kaisa");
+        Champion viktor = Champion("Viktor", "the Herald of the Arcane",
+            "The fully biomechanical evolution of his former self, Viktor has embraced his Glorious Evolution and become something of a messiah to his followers.", now.AddDays(-24));
+        Champion diana = Champion("Diana", "Scorn of the Moon",
+            "Bearing her crescent moonblade, Diana fights as a warrior of the Lunari, a faith all but quashed in the lands around Mount Targon.", now.AddDays(-23));
+        Champion fiora = Champion("Fiora", "the Grand Duelist",
+            "The most feared duelist in all Valoran, Fiora is as renowned for her brusque manner and cunning mind as she is for the speed of her bluesteel rapier.", now.AddDays(-23));
+        db.Champions.AddRange(ahri, jinx, yasuo, leeSin, malphite, lux, darius, thresh, garen, ezreal,
+            caitlyn, jhin, kaisa, viktor, diana, fiora);
         db.SaveChanges();
 
         // ---------- Builds ----------
@@ -155,6 +168,32 @@ public static class SeedData
             new() { 3020, 3100, 6655, 3089, 3135 }, "SummonerFlash", "SummonerTeleport",
             "Sorcery", "Arcane Comet", "Inspiration", now.AddDays(-5));
 
+        Build caitlynBot = Build(caitlyn, adcAndy, "Long-range lane bully Caitlyn", "Bot",
+            "Use your range to poke in lane and place traps under the enemy after your support lands crowd control. Push for early towers.",
+            new() { 3006, 3032, 3031, 3094, 3036 }, "SummonerFlash", "SummonerHeal",
+            "Precision", "Fleet Footwork", "Sorcery", now.AddDays(-12));
+        Build jhinBot = Build(jhin, fakerFan, "Four-shot crit Jhin", "Bot",
+            "Jhin converts attack speed into damage, so build crit and lethality. Save the fourth shot for trades and use W to root marked enemies.",
+            new() { 3009, 6676, 3031, 3094, 3036 }, "SummonerFlash", "SummonerHeal",
+            "Precision", "Fleet Footwork", "Inspiration", now.AddDays(-10));
+        Build kaisaBot = Build(kaisa, adcAndy, "Hybrid on-hit Kai'Sa", "Bot",
+            "Kraken and Nashor's upgrade your W and E early, Rabadon's makes the late-game ultimate dives deadly.",
+            new() { 3006, 6672, 3115, 3124, 3089 }, "SummonerFlash", "SummonerHeal",
+            "Precision", "Lethal Tempo", "Domination", now.AddDays(-9));
+        Build viktorMid = Build(viktor, midOrFeed, "Control mage Viktor", "Mid",
+            "Farm safely with E until your Q upgrade, then control teamfights with W and the ultimate from the back line.",
+            new() { 3020, 6655, 3089, 3157, 3135 }, "SummonerFlash", "SummonerTeleport",
+            "Inspiration", "First Strike", "Sorcery", now.AddDays(-7));
+        Build dianaJungle = Build(diana, jungleDiff, "AP burst Diana jungle", "Jungle",
+            "Fast clears with W and E. After level 6 dive the backline with Q into R and use Rocketbelt to close the gap.",
+            new() { 3020, 3152, 3157, 3089, 3135 }, "SummonerFlash", "SummonerSmite",
+            "Domination", "Electrocute", "Precision", now.AddDays(-6));
+        Build fioraTop = Build(fiora, topGapTom, "Split-push Fiora", "Top",
+            "Win side lanes with vitals and parry key abilities with W. Ravenous Hydra gives wave clear and healing for long duels.",
+            new() { 3047, 3074, 3078, 6333, 3053 }, "SummonerFlash", "SummonerTeleport",
+            "Precision", "Conqueror", "Resolve", now.AddDays(-4));
+
+        db.Builds.AddRange(caitlynBot, jhinBot, kaisaBot, viktorMid, dianaJungle, fioraTop);
         db.Builds.AddRange(ahriBurst, ahriSafe, ahriRoam, jinxCrit, jinxOnHit, yasuoCrit, yasuoTop,
             leeSinBruiser, leeSinTank, malphiteTank, malphiteAp, malphiteSupport, luxSupport, luxMid,
             dariusTop, dariusJungle, threshSupport, threshPeel, garenTop, garenLethality, ezrealBot, ezrealAp);
@@ -206,7 +245,17 @@ public static class SeedData
             Comment(ezrealBot, fakerFan, "Manamune stacks so fast with Q, good build.", now.AddDays(-12)),
             Comment(ezrealBot, wardWarden, "First Strike gold adds up quickly on Ezreal.", now.AddDays(-7)),
             Comment(ezrealAp, adcAndy, "AP Ezreal mid is a fun change from bot lane.", now.AddDays(-4)),
-            Comment(ezrealAp, jungleDiff, "Hard to play into assassins, but the burst is huge.", now.AddDays(-3)));
+            Comment(ezrealAp, jungleDiff, "Hard to play into assassins, but the burst is huge.", now.AddDays(-3)),
+            Comment(caitlynBot, supportMain, "Traps after a Morgana root are free kills.", now.AddDays(-11)),
+            Comment(caitlynBot, wardWarden, "Rapid Firecannon range on Caitlyn is unfair in lane.", now.AddDays(-8)),
+            Comment(jhinBot, adcAndy, "The Collector on Jhin feels great with the ultimate execute.", now.AddDays(-9)),
+            Comment(jhinBot, supportMain, "Love playing Jhin with an engage support, the W root follow-up is easy.", now.AddDays(-6)),
+            Comment(kaisaBot, fakerFan, "Rushing Nashor's for the W upgrade is underrated.", now.AddDays(-8)),
+            Comment(viktorMid, wardWarden, "First Strike gold lets Viktor get the Q upgrade really fast.", now.AddDays(-5)),
+            Comment(viktorMid, jungleDiff, "Hard lane into assassins, play safe until Zhonya's.", now.AddDays(-3)),
+            Comment(dianaJungle, topGapTom, "Diana ultimate into a group fight wins games.", now.AddDays(-4)),
+            Comment(fioraTop, adcAndy, "Fiora is the best split pusher right now.", now.AddDays(-3)),
+            Comment(fioraTop, jungleDiff, "Parrying Darius ultimate felt amazing.", now.AddDays(-2)));
         db.SaveChanges();
     }
 
@@ -221,9 +270,10 @@ public static class SeedData
         };
     }
 
-    private static Champion Champion(string name, string title, string description, DateTime createdAt)
+    // imageKey is the portrait file name when it differs from the champion name (e.g. Kai'Sa -> Kaisa).
+    private static Champion Champion(string name, string title, string description, DateTime createdAt, string? imageKey = null)
     {
-        string imageKey = name.Replace(" ", "");
+        imageKey ??= name.Replace(" ", "");
         return new Champion
         {
             Name = name,
