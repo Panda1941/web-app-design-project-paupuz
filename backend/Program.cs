@@ -76,6 +76,18 @@ builder.Services.AddProblemDetails();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "LoL Builds API",
+        Version = "v1",
+        Description =
+            "REST API for creating and discussing League of Legends champion builds. " +
+            "Resources form the hierarchy Champion -> Build -> Comment. " +
+            "Lists support paging (page, pageSize) and filters; every resource has hypermedia links. " +
+            "Log in with POST /api/auth/login (e.g. faker_fan / Password123!, or admin / Password123!) " +
+            "and send the access token as 'Authorization: Bearer <token>'.",
+    });
+
     string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile));
 
@@ -93,10 +105,15 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// ---------- CORS (the React frontend runs on a different origin) ----------
+// ---------- CORS ----------
+// The React frontend runs on a different origin (domain/port), so the browser only lets it read
+// API responses if the API allows that origin. Only the origins listed in Cors:AllowedOrigins
+// (comma separated) are allowed, e.g. http://localhost:5173 locally and the real frontend URL in production.
+string[] allowedOrigins = (builder.Configuration["Cors:AllowedOrigins"] ?? "")
+    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+    options.AddDefaultPolicy(policy => policy.WithOrigins(allowedOrigins).AllowAnyHeader().AllowAnyMethod());
 });
 
 var app = builder.Build();

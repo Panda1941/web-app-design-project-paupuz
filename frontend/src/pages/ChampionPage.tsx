@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ChevronRight, Hammer, MessageSquare, Pencil, Plus, ScrollText, Trash2 } from 'lucide-react'
-import { api, type Build, type ChampionSummary, type Paged } from '../api'
+import { api, type Build, type Champion, type ChampionSummary, type Paged } from '../api'
 import { useAuth } from '../auth'
 import { useToast } from '../toast'
 import { POSITIONS, itemImage, itemName, positionImage } from '../data/gameData'
@@ -23,6 +23,7 @@ export function ChampionPage() {
   const toast = useToast()
   const navigate = useNavigate()
 
+  const [champion, setChampion] = useState<Champion | null>(null)
   const [summary, setSummary] = useState<ChampionSummary | null>(null)
   const [builds, setBuilds] = useState<Paged<Build> | null>(null)
   const [position, setPosition] = useState('')
@@ -31,7 +32,12 @@ export function ChampionPage() {
   const [reload, setReload] = useState(0)
   const [modal, setModal] = useState<'edit' | 'delete' | 'newBuild' | null>(null)
 
+  // GET /api/champions/{id} for the champion itself, GET .../summary for the counts.
   useEffect(() => {
+    api
+      .getChampion(championId)
+      .then(setChampion)
+      .catch((err) => setError(err.message))
     api
       .getChampionSummary(championId)
       .then(setSummary)
@@ -46,9 +52,7 @@ export function ChampionPage() {
   }, [championId, position, page, reload])
 
   if (error) return <ErrorBox message={error} />
-  if (!summary) return <Spinner />
-
-  const champion = summary.champion
+  if (!champion || !summary) return <Spinner />
 
   return (
     <>

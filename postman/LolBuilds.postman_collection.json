@@ -1083,7 +1083,7 @@
           "response": []
         },
         {
-          "name": "4.2 Build 3 belongs to champion 2, not champion 1",
+          "name": "4.2 Build 4 belongs to champion 2, not champion 1",
           "event": [
             {
               "listen": "test",
@@ -1110,7 +1110,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/champions/1/builds/3",
+              "raw": "{{baseUrl}}/api/champions/1/builds/4",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1119,7 +1119,7 @@
                 "champions",
                 "1",
                 "builds",
-                "3"
+                "4"
               ]
             }
           },

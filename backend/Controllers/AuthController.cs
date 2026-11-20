@@ -23,6 +23,10 @@ public class AuthController : ApiControllerBase
     }
 
     /// <summary>Register a new user (role User) and log them in.</summary>
+    /// <response code="201">Created. The Location header points to the new resource.</response>
+    /// <response code="400">The body is not valid JSON or has wrong value types.</response>
+    /// <response code="409">Conflict: that name, username or email already exists.</response>
+    /// <response code="422">The JSON is valid, but the values break validation rules.</response>
     [HttpPost("register")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -54,6 +58,9 @@ public class AuthController : ApiControllerBase
     }
 
     /// <summary>Log in with username and password. Returns an access token and a refresh token.</summary>
+    /// <response code="200">Success.</response>
+    /// <response code="401">Not logged in, or the token is missing, invalid or expired.</response>
+    /// <response code="422">The JSON is valid, but the values break validation rules.</response>
     [HttpPost("login")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
@@ -72,6 +79,9 @@ public class AuthController : ApiControllerBase
     }
 
     /// <summary>Exchange a refresh token for a new access token and a new refresh token (the old one stops working).</summary>
+    /// <response code="200">Success.</response>
+    /// <response code="401">Not logged in, or the token is missing, invalid or expired.</response>
+    /// <response code="422">The JSON is valid, but the values break validation rules.</response>
     [HttpPost("refresh")]
     [ProducesResponseType(typeof(AuthResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
@@ -100,6 +110,8 @@ public class AuthController : ApiControllerBase
     }
 
     /// <summary>Log out: revokes all of the current user's refresh tokens.</summary>
+    /// <response code="204">Done, no response body.</response>
+    /// <response code="401">Not logged in, or the token is missing, invalid or expired.</response>
     [Authorize]
     [HttpPost("logout")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -111,6 +123,8 @@ public class AuthController : ApiControllerBase
     }
 
     /// <summary>Get the currently logged-in user.</summary>
+    /// <response code="200">Success.</response>
+    /// <response code="401">Not logged in, or the token is missing, invalid or expired.</response>
     [Authorize]
     [HttpGet("me")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]

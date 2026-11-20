@@ -263,6 +263,8 @@ export const api = {
       'GET',
       `/api/champions/${championId}/builds/${buildId}/comments${query({ page, pageSize: 10 })}`,
     ),
+  getComment: (championId: number, buildId: number, commentId: number) =>
+    request<Comment>('GET', `/api/champions/${championId}/builds/${buildId}/comments/${commentId}`),
   createComment: (championId: number, buildId: number, text: string) =>
     request<Comment>('POST', `/api/champions/${championId}/builds/${buildId}/comments`, { text }),
   updateComment: (championId: number, buildId: number, commentId: number, text: string) =>

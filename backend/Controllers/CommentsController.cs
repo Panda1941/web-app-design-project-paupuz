@@ -24,6 +24,8 @@ public class CommentsController : ApiControllerBase
     /// <param name="search">Optional filter: text the comment contains (case-insensitive).</param>
     /// <param name="page">Page number, starting at 1.</param>
     /// <param name="pageSize">Items per page (1-50).</param>
+    /// <response code="200">Success.</response>
+    /// <response code="404">Not found, or it does not belong to the parent in the URL.</response>
     [HttpGet]
     [ProducesResponseType(typeof(PagedResponse<CommentDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -64,6 +66,8 @@ public class CommentsController : ApiControllerBase
     }
 
     /// <summary>Get one comment of a build.</summary>
+    /// <response code="200">Success.</response>
+    /// <response code="404">Not found, or it does not belong to the parent in the URL.</response>
     [HttpGet("{commentId:int}")]
     [ProducesResponseType(typeof(CommentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -77,6 +81,11 @@ public class CommentsController : ApiControllerBase
     }
 
     /// <summary>Create a comment under a build. Logged-in users only.</summary>
+    /// <response code="401">Not logged in, or the token is missing, invalid or expired.</response>
+    /// <response code="201">Created. The Location header points to the new resource.</response>
+    /// <response code="400">The body is not valid JSON or has wrong value types.</response>
+    /// <response code="404">Not found, or it does not belong to the parent in the URL.</response>
+    /// <response code="422">The JSON is valid, but the values break validation rules.</response>
     [Authorize]
     [HttpPost]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
@@ -106,6 +115,12 @@ public class CommentsController : ApiControllerBase
     }
 
     /// <summary>Update a comment. Only its author can do this.</summary>
+    /// <response code="401">Not logged in, or the token is missing, invalid or expired.</response>
+    /// <response code="403">Logged in, but not allowed (wrong role, or not the author).</response>
+    /// <response code="200">Success.</response>
+    /// <response code="400">The body is not valid JSON or has wrong value types.</response>
+    /// <response code="404">Not found, or it does not belong to the parent in the URL.</response>
+    /// <response code="422">The JSON is valid, but the values break validation rules.</response>
     [Authorize]
     [HttpPut("{commentId:int}")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
@@ -130,6 +145,10 @@ public class CommentsController : ApiControllerBase
     }
 
     /// <summary>Delete a comment. Its author or an admin can do this.</summary>
+    /// <response code="401">Not logged in, or the token is missing, invalid or expired.</response>
+    /// <response code="403">Logged in, but not allowed (wrong role, or not the author).</response>
+    /// <response code="204">Done, no response body.</response>
+    /// <response code="404">Not found, or it does not belong to the parent in the URL.</response>
     [Authorize]
     [HttpDelete("{commentId:int}")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]

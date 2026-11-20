@@ -282,6 +282,8 @@ function Comments({ championId, buildId }: { championId: number; buildId: number
 
       {editing && (
         <EditCommentModal
+          championId={championId}
+          buildId={buildId}
           comment={editing}
           onClose={() => setEditing(null)}
           onSave={async (newText) => {
@@ -317,11 +319,22 @@ function Comments({ championId, buildId }: { championId: number; buildId: number
 }
 
 function EditCommentModal(props: {
+  championId: number
+  buildId: number
   comment: Comment
   onSave: (text: string) => Promise<void>
   onClose: () => void
 }) {
   const [text, setText] = useState(props.comment.text)
+
+  // Load the latest version of the comment (GET .../comments/{id}) in case it changed since the list loaded.
+  useEffect(() => {
+    api
+      .getComment(props.championId, props.buildId, props.comment.id)
+      .then((fresh) => setText(fresh.text))
+      .catch(() => {})
+  }, [props.championId, props.buildId, props.comment.id])
+
   const [saving, setSaving] = useState(false)
   const v = useValidation({ text: checkText(text, 'Comment', 2, 1000) })
 

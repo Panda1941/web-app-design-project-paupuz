@@ -2,7 +2,7 @@
 
 Saityno taikomųjų programų projektavimo modulio projektas – „League of Legends“ čempionų build’ų kūrimo ir aptarimo platforma.
 
-Šiame dokumente pateikiama projekto užduotis ir numatomas sistemos veikimas. Aprašytos funkcijos dar nėra realizuotos.
+Šiame dokumente aprašyta projekto užduotis, realizuota sistema, jos API ir paleidimas.
 
 ## 1. Sprendžiamo uždavinio aprašymas
 
@@ -12,11 +12,11 @@ Saityno taikomųjų programų projektavimo modulio projektas – „League of Le
 
 Projekto tikslas – sukurti internetinę platformą, kurioje naudotojai galėtų kurti čempionams skirtus build’us, dalintis jais ir aptarti juos komentaruose. Build’ą sudarys pavadinimas, aprašymas, žaidimo pozicija, pasirinkti daiktai, summoner spell'ai ir runos.
 
-Čempionai bus iš anksto įkelti į sistemą, o jų informaciją valdys administratorius. Build’us ir komentarus kurs registruoti naudotojai. Neprisijungę lankytojai galės peržiūrėti viešai pateiktą turinį.
+Čempionai iš anksto įkelti į sistemą, o jų informaciją valdo administratorius. Build’us ir komentarus kuria registruoti naudotojai. Neprisijungę lankytojai gali peržiūrėti viešai pateiktą turinį.
 
 ### 1.2. Taikomosios srities objektai
 
-Sistemoje numatomi trys pagrindiniai objektai:
+Sistemoje yra trys pagrindiniai objektai:
 
 | Objektas | Paskirtis ir pagrindinė informacija |
 | --- | --- |
@@ -29,15 +29,15 @@ Objektai sudaro hierarchiją **Champion → Build → Comment**:
 - Vienam čempionui gali priklausyti daug build’ų. Kiekvienas build’as priklauso vienam čempionui.
 - Vienam build’ui gali priklausyti daug komentarų. Kiekvienas komentaras priklauso vienam build’ui.
 
-Naudotojų paskyros bus saugomos atskirai ir naudojamos autentifikacijai, autorizacijai bei turinio autorystei nustatyti. Jos nėra vienas iš trijų pagrindinių taikomosios srities objektų.
+Naudotojų paskyros saugomos atskirai ir naudojamos autentifikacijai, autorizacijai bei turinio autorystei nustatyti. Jos nėra vienas iš trijų pagrindinių taikomosios srities objektų.
 
-Daiktai, burtai ir runos bus pasirenkami iš iš anksto parengto katalogo. Pasirinkta kombinacija bus saugoma kaip build’o dalis; atskiros jų CRUD valdymo funkcijos į pradinę projekto apimtį neįtraukiamos.
+Daiktai, burtai ir runos pasirenkami iš iš anksto parengto katalogo. Pasirinkta kombinacija saugoma kaip build’o dalis; atskiros jų CRUD valdymo funkcijos į pradinę projekto apimtį neįtraukiamos.
 
 ### 1.3. Funkciniai reikalavimai
 
 #### Svečias
 
-Neprisijungęs naudotojas galės:
+Neprisijungęs naudotojas gali:
 
 1. Peržiūrėti čempionų sąrašą ir konkretaus čempiono informaciją.
 2. Peržiūrėti pasirinktam čempionui sukurtus build’us.
@@ -47,7 +47,7 @@ Neprisijungęs naudotojas galės:
 
 #### Registruotas naudotojas
 
-Prisijungęs naudotojas galės naudotis svečiui prieinamomis turinio peržiūros funkcijomis ir papildomai:
+Prisijungęs naudotojas gali naudotis svečiui prieinamomis turinio peržiūros funkcijomis ir papildomai:
 
 1. Sukurti pasirinktam čempionui skirtą build’ą: nurodyti jo pavadinimą, aprašymą ir žaidimo poziciją, pasirinkti daiktus, burtus bei runas.
 2. Redaguoti ir pašalinti savo sukurtus build’us.
@@ -55,20 +55,20 @@ Prisijungęs naudotojas galės naudotis svečiui prieinamomis turinio peržiūro
 4. Redaguoti ir pašalinti savo komentarus.
 5. Atsijungti nuo sistemos.
 
-Registruotas naudotojas negalės redaguoti ar pašalinti kitų naudotojų build’ų ir komentarų. Šios teisės bus tikrinamos serverio pusėje pagal prisijungusio naudotojo identifikatorių.
+Registruotas naudotojas negali redaguoti ar pašalinti kitų naudotojų build’ų ir komentarų. Šios teisės tikrinamos serverio pusėje pagal prisijungusio naudotojo identifikatorių.
 
 #### Administratorius
 
-Administratorius galės naudotis registruotam naudotojui prieinamomis funkcijomis ir papildomai:
+Administratorius gali naudotis registruotam naudotojui prieinamomis funkcijomis ir papildomai:
 
 1. Pridėti naują čempioną.
 2. Redaguoti čempiono informaciją.
 3. Pašalinti čempioną.
 4. Pašalinti netinkamus build’us ir komentarus, nepriklausomai nuo jų autoriaus.
 
-## 2. Numatomos REST API operacijos
+## 2. REST API operacijos
 
-Kiekvienam pagrindiniam objektui bus realizuotos penkios operacijos: sukūrimas, vieno objekto gavimas, atnaujinimas, pašalinimas ir sąrašo gavimas. Iš viso numatoma **15 taikomosios srities API metodų**. Registracijos, prisijungimo, atsijungimo ir žetonų atnaujinimo metodai bus papildomi.
+Kiekvienam pagrindiniam objektui realizuotos penkios operacijos: sukūrimas, vieno objekto gavimas, atnaujinimas, pašalinimas ir sąrašo gavimas. Iš viso yra **15 taikomosios srities API metodų**. Papildomai realizuoti suvestinės, registracijos, prisijungimo, atsijungimo ir žetonų atnaujinimo metodai.
 
 | Objektas | Metodas | Kelias | Paskirtis |
 | --- | --- | --- | --- |
@@ -99,16 +99,18 @@ Papildomai:
 
 Atsako kodai: `200` – sėkminga užklausa, `201` – sukurta (su `Location` antrašte), `204` – ištrinta, `400` – neperskaitomas JSON arba netinkami reikšmių tipai, `404` – objektas nerastas arba nepriklauso nurodytam tėviniam objektui, `409` – toks čempionas jau yra, `422` – JSON teisingas, bet reikšmės neatitinka taisyklių.
 
-API grąžins duomenis JSON formatu ir užklausos rezultatą atitinkančius HTTP būsenos kodus. Visiems prieigos taškams bus parengtas užklausų rinkinys testavimui, o kiekvieno pagrindinio objekto lentelė bus užpildyta bent penkiais prasmingais įrašais.
+API grąžina duomenis JSON formatu ir užklausos rezultatą atitinkančius HTTP būsenos kodus. Visiems prieigos taškams parengtas Postman užklausų rinkinys su testais (`postman/`). Duomenų bazė užpildoma prasmingais pradiniais duomenimis: 8 naudotojai, 10 čempionų, 22 build’ai ir 45 komentarai.
 
-## 3. Pasirinktos ir numatomos technologijos
+Pilna OpenAPI specifikacija su pavyzdžiais ir galimais atsakais pateikta faile [`docs/openapi.json`](docs/openapi.json), o paleidus API ją galima naršyti per Swagger UI (`/swagger`).
+
+## 3. Pasirinktos technologijos
 
 Frontend ir backend technologijos pasirinktos atsižvelgiant į patirtį su kitais projektais. Duomenų bazei pasirinkta SQLite, prieigai prie jos – Entity Framework Core.
 
 | Sistemos dalis | Technologija | Pasirinkimo pagrindimas |
 | --- | --- | --- |
-| Kliento dalis | **React ir TypeScript** | React komponentai leis kurti ir pakartotinai naudoti čempionų, build’ų bei komentarų sąsajos elementus. TypeScript padės aprašyti API duomenų struktūras ir aptikti tipų klaidas kuriant programą. |
-| Serverio dalis | **C# ir ASP.NET Core** | Bus naudojami REST API, duomenų tikrinimui, autentifikacijai ir autorizacijai realizuoti. Šios technologijos jau naudojamos kituose projektuose. |
+| Kliento dalis | **React ir TypeScript** | React komponentai leidžia kurti ir pakartotinai naudoti čempionų, build’ų bei komentarų sąsajos elementus. TypeScript padeda aprašyti API duomenų struktūras ir aptikti tipų klaidas kuriant programą. |
+| Serverio dalis | **C# ir ASP.NET Core** | Naudojami REST API, duomenų tikrinimui, autentifikacijai ir autorizacijai realizuoti. Šios technologijos jau naudojamos kituose projektuose. |
 | Duomenų bazė | **SQLite** | Reliacinė duomenų bazė, laikoma viename faile ir nereikalaujanti atskiro serverio. Užtenka šios sistemos apkrovai, palaiko išorinius raktus ir kaskadinį trynimą. Esant daug lygiagrečių rašymų, tinkamesnė būtų PostgreSQL. |
 | Prieiga prie duomenų bazės | **Entity Framework Core** | Duomenų modelis aprašomas C# klasėmis. Paleidus programą, duomenų bazė sukuriama ir užpildoma pradiniais duomenimis automatiškai. |
 
@@ -131,17 +133,17 @@ Naudojami JWT prieigos žetonai ir atnaujinimo (refresh) žetonai.
 
 Demonstraciniai naudotojai (slaptažodis `Password123!`): `admin` (Admin), `faker_fan`, `jungle_diff`, `support_main` (User).
 
-Autorizacija bus tikrinama serverio pusėje pagal naudotojo rolę ir turinio autorystę. Grafinė sąsaja leis atlikti naudotojo teisėms priklausančias CRUD operacijas ir prisitaikys prie skirtingų ekrano dydžių.
+Autorizacija tikrinama serverio pusėje pagal naudotojo rolę ir turinio autorystę. Grafinė sąsaja leidžia atlikti naudotojo teisėms priklausančias CRUD operacijas ir prisitaiko prie skirtingų ekrano dydžių.
 
 ## 4. Sistemos architektūra ir diegimas
 
-Numatomos trys sistemos dalys:
+Sistemą sudaro trys dalys:
 
 1. **Kliento aplikacija** – React ir TypeScript grafinė sąsaja, vykdoma naudotojo naršyklėje.
 2. **REST API** – ASP.NET Core serverio aplikacija, vykdanti užklausas, tikrinanti teises ir dirbanti su duomenų baze.
 3. **Duomenų bazė** – SQLite, sauganti čempionus, build’us, komentarus, naudotojų paskyras ir autentifikacijos sesijų duomenis.
 
-Kliento aplikacija ir REST API bus talpinamos debesijos aplinkoje ir pasiekiamos internetu. Naršyklė gaus kliento aplikacijos failus iš frontend talpinimo paslaugos, o aplikacija kreipsis į REST API per HTTPS. Prie duomenų bazės jungsis serverio aplikacija; naršyklė tiesioginės prieigos prie jos neturės.
+Kliento aplikacija ir REST API talpinamos debesijos platformoje Railway ir pasiekiamos internetu. Naršyklė gauna kliento aplikacijos failus iš frontend paslaugos, o aplikacija kreipiasi į REST API per HTTPS. Prie duomenų bazės jungiasi tik serverio aplikacija; naršyklė tiesioginės prieigos prie jos neturi.
 
 **Diegimo diagrama bus pridėta vėliau.** Ji bus parengta pagal UML standartą, pasirinkus debesijos tiekėją ir konkretų sistemos dalių talpinimo būdą. Diagramoje bus parodytas naudotojo įrenginys su naršykle, frontend talpinimo aplinka, API vykdymo aplinka, duomenų bazė ir jų ryšiai.
 
