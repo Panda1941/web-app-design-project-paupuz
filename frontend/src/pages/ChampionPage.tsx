@@ -32,7 +32,7 @@ export function ChampionPage() {
   const [reload, setReload] = useState(0)
   const [modal, setModal] = useState<'edit' | 'delete' | 'newBuild' | null>(null)
 
-  // GET /api/champions/{id} for the champion itself, GET .../summary for the counts.
+  // GET /api/v1/champions/{id} for the champion itself, GET .../summary for the counts.
   useEffect(() => {
     api
       .getChampion(championId)

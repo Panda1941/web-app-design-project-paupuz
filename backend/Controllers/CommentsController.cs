@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LolBuilds.Api.Controllers;
 
 // Comment routes span the whole hierarchy: champion -> build -> comment.
-[Route("api/champions/{championId:int}/builds/{buildId:int}/comments")]
+[Route("api/v1/champions/{championId:int}/builds/{buildId:int}/comments")]
 public class CommentsController : ApiControllerBase
 {
     private readonly AppDbContext _db;
@@ -58,10 +58,10 @@ public class CommentsController : ApiControllerBase
         foreach (Comment comment in comments)
             items.Add(Mapping.ToDto(comment, championId));
 
-        string basePath = $"/api/champions/{championId}/builds/{buildId}/comments";
+        string basePath = $"/api/v1/champions/{championId}/builds/{buildId}/comments";
         int totalPages = TotalPages(totalCount, pageSize);
         var links = Mapping.PageLinks(basePath, extraQuery, page, pageSize, totalPages);
-        links.Add(new LinkDto($"/api/champions/{championId}/builds/{buildId}", "build", "GET"));
+        links.Add(new LinkDto($"/api/v1/champions/{championId}/builds/{buildId}", "build", "GET"));
         return Ok(new PagedResponse<CommentDto>(items, page, pageSize, totalCount, totalPages, links));
     }
 

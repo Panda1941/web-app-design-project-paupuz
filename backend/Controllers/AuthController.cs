@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LolBuilds.Api.Controllers;
 
-[Route("api/auth")]
+[Route("api/v1/auth")]
 public class AuthController : ApiControllerBase
 {
     private readonly AppDbContext _db;

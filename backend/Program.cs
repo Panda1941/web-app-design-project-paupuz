@@ -84,7 +84,7 @@ builder.Services.AddSwaggerGen(options =>
             "REST API for creating and discussing League of Legends champion builds. " +
             "Resources form the hierarchy Champion -> Build -> Comment. " +
             "Lists support paging (page, pageSize) and filters; every resource has hypermedia links. " +
-            "Log in with POST /api/auth/login (e.g. faker_fan / Password123!, or admin / Password123!) " +
+            "Log in with POST /api/v1/auth/login (e.g. faker_fan / Password123!, or admin / Password123!) " +
             "and send the access token as 'Authorization: Bearer <token>'.",
     });
 
@@ -97,7 +97,7 @@ builder.Services.AddSwaggerGen(options =>
         Type = SecuritySchemeType.Http,
         Scheme = "bearer",
         BearerFormat = "JWT",
-        Description = "Paste the accessToken from POST /api/auth/login.",
+        Description = "Paste the accessToken from POST /api/v1/auth/login.",
     });
     options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {

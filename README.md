@@ -72,21 +72,21 @@ Kiekvienam pagrindiniam objektui realizuotos penkios operacijos: sukūrimas, vie
 
 | Objektas | Metodas | Kelias | Paskirtis |
 | --- | --- | --- | --- |
-| Champion | GET | `/api/champions` | Gauti čempionų sąrašą. |
-| Champion | POST | `/api/champions` | Sukurti čempioną. |
-| Champion | GET | `/api/champions/{championId}` | Gauti konkretų čempioną. |
-| Champion | PUT | `/api/champions/{championId}` | Atnaujinti čempioną. |
-| Champion | DELETE | `/api/champions/{championId}` | Pašalinti čempioną. |
-| Build | GET | `/api/champions/{championId}/builds` | Gauti konkretaus čempiono build’ų sąrašą. |
-| Build | POST | `/api/champions/{championId}/builds` | Sukurti build’ą konkrečiam čempionui. |
-| Build | GET | `/api/champions/{championId}/builds/{buildId}` | Gauti konkretų čempiono build’ą. |
-| Build | PUT | `/api/champions/{championId}/builds/{buildId}` | Atnaujinti build’ą. |
-| Build | DELETE | `/api/champions/{championId}/builds/{buildId}` | Pašalinti build’ą. |
-| Comment | GET | `/api/champions/{championId}/builds/{buildId}/comments` | Gauti konkretaus build’o komentarų sąrašą. |
-| Comment | POST | `/api/champions/{championId}/builds/{buildId}/comments` | Sukurti komentarą po konkrečiu build’u. |
-| Comment | GET | `/api/champions/{championId}/builds/{buildId}/comments/{commentId}` | Gauti konkretų build’o komentarą. |
-| Comment | PUT | `/api/champions/{championId}/builds/{buildId}/comments/{commentId}` | Atnaujinti komentarą. |
-| Comment | DELETE | `/api/champions/{championId}/builds/{buildId}/comments/{commentId}` | Pašalinti komentarą. |
+| Champion | GET | `/api/v1/champions` | Gauti čempionų sąrašą. |
+| Champion | POST | `/api/v1/champions` | Sukurti čempioną. |
+| Champion | GET | `/api/v1/champions/{championId}` | Gauti konkretų čempioną. |
+| Champion | PUT | `/api/v1/champions/{championId}` | Atnaujinti čempioną. |
+| Champion | DELETE | `/api/v1/champions/{championId}` | Pašalinti čempioną. |
+| Build | GET | `/api/v1/champions/{championId}/builds` | Gauti konkretaus čempiono build’ų sąrašą. |
+| Build | POST | `/api/v1/champions/{championId}/builds` | Sukurti build’ą konkrečiam čempionui. |
+| Build | GET | `/api/v1/champions/{championId}/builds/{buildId}` | Gauti konkretų čempiono build’ą. |
+| Build | PUT | `/api/v1/champions/{championId}/builds/{buildId}` | Atnaujinti build’ą. |
+| Build | DELETE | `/api/v1/champions/{championId}/builds/{buildId}` | Pašalinti build’ą. |
+| Comment | GET | `/api/v1/champions/{championId}/builds/{buildId}/comments` | Gauti konkretaus build’o komentarų sąrašą. |
+| Comment | POST | `/api/v1/champions/{championId}/builds/{buildId}/comments` | Sukurti komentarą po konkrečiu build’u. |
+| Comment | GET | `/api/v1/champions/{championId}/builds/{buildId}/comments/{commentId}` | Gauti konkretų build’o komentarą. |
+| Comment | PUT | `/api/v1/champions/{championId}/builds/{buildId}/comments/{commentId}` | Atnaujinti komentarą. |
+| Comment | DELETE | `/api/v1/champions/{championId}/builds/{buildId}/comments/{commentId}` | Pašalinti komentarą. |
 
 Komentarų keliai apima visus tris hierarchijos objektus. Serveris tikrins, ar build’as priklauso nurodytam čempionui, o komentaras – nurodytam build’ui.
 
@@ -95,7 +95,7 @@ Papildomai:
 - **Puslapiavimas** – visi sąrašų metodai priima `page` ir `pageSize` (1–50) parametrus ir grąžina `items`, `page`, `pageSize`, `totalCount`, `totalPages`.
 - **Filtravimas** – čempionai pagal pavadinimą (`?name=ah`), build’ai pagal poziciją (`?position=Mid`), komentarai pagal tekstą (`?search=zhonya`).
 - **Hypermedia** – kiekvienas objektas ir sąrašas turi `links` masyvą su susijusiais keliais ir leidžiamais veiksmais (`self`, `update`, `delete`, `builds`, `comments`, `next`, `previous` ir kt.).
-- **Suvestinė iš kelių esybių** – `GET /api/champions/{championId}/summary` grąžina čempioną, jo build’ų ir komentarų skaičių, build’ų pasiskirstymą pagal pozicijas ir naujausius build’us.
+- **Suvestinė iš kelių esybių** – `GET /api/v1/champions/{championId}/summary` grąžina čempioną, jo build’ų ir komentarų skaičių, build’ų pasiskirstymą pagal pozicijas ir naujausius build’us.
 
 Atsako kodai: `200` – sėkminga užklausa, `201` – sukurta (su `Location` antrašte), `204` – ištrinta, `400` – neperskaitomas JSON arba netinkami reikšmių tipai, `404` – objektas nerastas arba nepriklauso nurodytam tėviniam objektui, `409` – toks čempionas jau yra, `422` – JSON teisingas, bet reikšmės neatitinka taisyklių.
 
@@ -120,11 +120,11 @@ Naudojami JWT prieigos žetonai ir atnaujinimo (refresh) žetonai.
 
 | Metodas | Kelias | Paskirtis |
 | --- | --- | --- |
-| POST | `/api/auth/register` | Registracija (rolė `User`). Grąžina žetonų porą. |
-| POST | `/api/auth/login` | Prisijungimas. Grąžina žetonų porą. |
-| POST | `/api/auth/refresh` | Atnaujinimo žetono keitimas nauja žetonų pora. |
-| POST | `/api/auth/logout` | Atsijungimas: panaikinami visi naudotojo atnaujinimo žetonai. |
-| GET | `/api/auth/me` | Prisijungusio naudotojo duomenys. |
+| POST | `/api/v1/auth/register` | Registracija (rolė `User`). Grąžina žetonų porą. |
+| POST | `/api/v1/auth/login` | Prisijungimas. Grąžina žetonų porą. |
+| POST | `/api/v1/auth/refresh` | Atnaujinimo žetono keitimas nauja žetonų pora. |
+| POST | `/api/v1/auth/logout` | Atsijungimas: panaikinami visi naudotojo atnaujinimo žetonai. |
+| GET | `/api/v1/auth/me` | Prisijungusio naudotojo duomenys. |
 
 - **Prieigos žetonas** – JWT, galioja 15 min., siunčiamas antraštėje `Authorization: Bearer <žetonas>`. Jame saugomi naudotojo ID (`sub`), vardas (`unique_name`), rolė (`role`), unikalus ID (`jti`), galiojimo laikas (`exp`), išdavėjas (`iss`) ir auditorija (`aud`). Pasirašomas HMAC-SHA256 algoritmu slaptu raktu `Jwt:Key`, kuris produkcinėje aplinkoje nustatomas aplinkos kintamuoju `Jwt__Key`.
 - **Atnaujinimo žetonas** – atsitiktinė 64 baitų eilutė, galioja 7 d. Duomenų bazėje saugoma tik jo SHA-256 maiša. Kiekvieną kartą atnaujinant senas žetonas panaikinamas ir išduodamas naujas (rotacija). Jei panaudotas žetonas pateikiamas dar kartą, panaikinami visi to naudotojo žetonai.

@@ -7,7 +7,7 @@ public static class Mapping
 {
     public static ChampionDto ToDto(Champion c)
     {
-        string self = $"/api/champions/{c.Id}";
+        string self = $"/api/v1/champions/{c.Id}";
         var links = new List<LinkDto>
         {
             new(self, "self", "GET"),
@@ -23,13 +23,13 @@ public static class Mapping
     // The build must be loaded with its Champion, Author and Comments.
     public static BuildDto ToDto(Build b)
     {
-        string self = $"/api/champions/{b.ChampionId}/builds/{b.Id}";
+        string self = $"/api/v1/champions/{b.ChampionId}/builds/{b.Id}";
         var links = new List<LinkDto>
         {
             new(self, "self", "GET"),
             new(self, "update", "PUT"),
             new(self, "delete", "DELETE"),
-            new($"/api/champions/{b.ChampionId}", "champion", "GET"),
+            new($"/api/v1/champions/{b.ChampionId}", "champion", "GET"),
             new($"{self}/comments", "comments", "GET"),
             new($"{self}/comments", "create-comment", "POST"),
         };
@@ -43,7 +43,7 @@ public static class Mapping
     // The comment must be loaded with its Author.
     public static CommentDto ToDto(Comment c, int championId)
     {
-        string buildUrl = $"/api/champions/{championId}/builds/{c.BuildId}";
+        string buildUrl = $"/api/v1/champions/{championId}/builds/{c.BuildId}";
         string self = $"{buildUrl}/comments/{c.Id}";
         var links = new List<LinkDto>
         {

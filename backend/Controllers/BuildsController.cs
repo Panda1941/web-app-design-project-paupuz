@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LolBuilds.Api.Controllers;
 
-[Route("api/champions/{championId:int}/builds")]
+[Route("api/v1/champions/{championId:int}/builds")]
 public class BuildsController : ApiControllerBase
 {
     private readonly AppDbContext _db;
@@ -58,8 +58,8 @@ public class BuildsController : ApiControllerBase
             items.Add(Mapping.ToDto(build));
 
         int totalPages = TotalPages(totalCount, pageSize);
-        var links = Mapping.PageLinks($"/api/champions/{championId}/builds", extraQuery, page, pageSize, totalPages);
-        links.Add(new LinkDto($"/api/champions/{championId}", "champion", "GET"));
+        var links = Mapping.PageLinks($"/api/v1/champions/{championId}/builds", extraQuery, page, pageSize, totalPages);
+        links.Add(new LinkDto($"/api/v1/champions/{championId}", "champion", "GET"));
         return Ok(new PagedResponse<BuildDto>(items, page, pageSize, totalCount, totalPages, links));
     }
 

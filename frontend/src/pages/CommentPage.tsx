@@ -6,7 +6,7 @@ import { ErrorBox, Panel, Spinner, formatDate } from '../components/common'
 
 // One comment on its own page. The URL matches the API:
 //   page: /champions/1/builds/2/comments/3
-//   API:  GET /api/champions/1/builds/2/comments/3
+//   API:  GET /api/v1/champions/1/builds/2/comments/3
 export function CommentPage() {
   const params = useParams()
   const championId = Number(params.championId)

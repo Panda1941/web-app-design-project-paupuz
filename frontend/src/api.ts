@@ -139,7 +139,7 @@ async function refreshTokens(): Promise<boolean> {
   if (!refreshToken) return false
 
   try {
-    const res = await fetch(`${API_URL}/api/auth/refresh`, {
+    const res = await fetch(`${API_URL}/api/v1/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
@@ -219,18 +219,18 @@ function query(params: Record<string, string | number | undefined>): string {
 export const api = {
   // auth
   async login(username: string, password: string): Promise<User> {
-    const auth = await request<AuthResponse>('POST', '/api/auth/login', { username, password })
+    const auth = await request<AuthResponse>('POST', '/api/v1/auth/login', { username, password })
     saveSession(auth)
     return auth.user
   },
   async register(username: string, email: string, password: string): Promise<User> {
-    const auth = await request<AuthResponse>('POST', '/api/auth/register', { username, email, password })
+    const auth = await request<AuthResponse>('POST', '/api/v1/auth/register', { username, email, password })
     saveSession(auth)
     return auth.user
   },
   async logout(): Promise<void> {
     try {
-      await request<void>('POST', '/api/auth/logout', undefined, false)
+      await request<void>('POST', '/api/v1/auth/logout', undefined, false)
     } finally {
       clearSession()
     }
@@ -238,37 +238,37 @@ export const api = {
 
   // champions
   getChampions: (name: string, page: number, pageSize = 12) =>
-    request<Paged<Champion>>('GET', `/api/champions${query({ name, page, pageSize })}`),
-  getChampion: (id: number) => request<Champion>('GET', `/api/champions/${id}`),
-  getChampionSummary: (id: number) => request<ChampionSummary>('GET', `/api/champions/${id}/summary`),
-  createChampion: (input: ChampionInput) => request<Champion>('POST', '/api/champions', input),
-  updateChampion: (id: number, input: ChampionInput) => request<Champion>('PUT', `/api/champions/${id}`, input),
-  deleteChampion: (id: number) => request<void>('DELETE', `/api/champions/${id}`),
+    request<Paged<Champion>>('GET', `/api/v1/champions${query({ name, page, pageSize })}`),
+  getChampion: (id: number) => request<Champion>('GET', `/api/v1/champions/${id}`),
+  getChampionSummary: (id: number) => request<ChampionSummary>('GET', `/api/v1/champions/${id}/summary`),
+  createChampion: (input: ChampionInput) => request<Champion>('POST', '/api/v1/champions', input),
+  updateChampion: (id: number, input: ChampionInput) => request<Champion>('PUT', `/api/v1/champions/${id}`, input),
+  deleteChampion: (id: number) => request<void>('DELETE', `/api/v1/champions/${id}`),
 
   // builds
   getBuilds: (championId: number, position: string, page: number) =>
-    request<Paged<Build>>('GET', `/api/champions/${championId}/builds${query({ position, page, pageSize: 8 })}`),
+    request<Paged<Build>>('GET', `/api/v1/champions/${championId}/builds${query({ position, page, pageSize: 8 })}`),
   getBuild: (championId: number, buildId: number) =>
-    request<Build>('GET', `/api/champions/${championId}/builds/${buildId}`),
+    request<Build>('GET', `/api/v1/champions/${championId}/builds/${buildId}`),
   createBuild: (championId: number, input: BuildInput) =>
-    request<Build>('POST', `/api/champions/${championId}/builds`, input),
+    request<Build>('POST', `/api/v1/champions/${championId}/builds`, input),
   updateBuild: (championId: number, buildId: number, input: BuildInput) =>
-    request<Build>('PUT', `/api/champions/${championId}/builds/${buildId}`, input),
+    request<Build>('PUT', `/api/v1/champions/${championId}/builds/${buildId}`, input),
   deleteBuild: (championId: number, buildId: number) =>
-    request<void>('DELETE', `/api/champions/${championId}/builds/${buildId}`),
+    request<void>('DELETE', `/api/v1/champions/${championId}/builds/${buildId}`),
 
   // comments
   getComments: (championId: number, buildId: number, page: number) =>
     request<Paged<Comment>>(
       'GET',
-      `/api/champions/${championId}/builds/${buildId}/comments${query({ page, pageSize: 10 })}`,
+      `/api/v1/champions/${championId}/builds/${buildId}/comments${query({ page, pageSize: 10 })}`,
     ),
   getComment: (championId: number, buildId: number, commentId: number) =>
-    request<Comment>('GET', `/api/champions/${championId}/builds/${buildId}/comments/${commentId}`),
+    request<Comment>('GET', `/api/v1/champions/${championId}/builds/${buildId}/comments/${commentId}`),
   createComment: (championId: number, buildId: number, text: string) =>
-    request<Comment>('POST', `/api/champions/${championId}/builds/${buildId}/comments`, { text }),
+    request<Comment>('POST', `/api/v1/champions/${championId}/builds/${buildId}/comments`, { text }),
   updateComment: (championId: number, buildId: number, commentId: number, text: string) =>
-    request<Comment>('PUT', `/api/champions/${championId}/builds/${buildId}/comments/${commentId}`, { text }),
+    request<Comment>('PUT', `/api/v1/champions/${championId}/builds/${buildId}/comments/${commentId}`, { text }),
   deleteComment: (championId: number, buildId: number, commentId: number) =>
-    request<void>('DELETE', `/api/champions/${championId}/builds/${buildId}/comments/${commentId}`),
+    request<void>('DELETE', `/api/v1/champions/${championId}/builds/${buildId}/comments/${commentId}`),
 }
