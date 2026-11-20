@@ -1,0 +1,1495 @@
+{
+  "info": {
+    "_postman_id": "0f1a9657-9bf9-4a72-b581-de756f05e8ce",
+    "name": "LolBuilds API",
+    "description": "Tests for the LolBuilds ASP.NET Core API. Re-runnable: the happy path creates its own champion, build and comment and deletes them at the end.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5224",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "championName",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "championId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "buildId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "commentId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1 Champions",
+      "item": [
+        {
+          "name": "1.1 List champions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Content-Type contains application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test(\"Body has items array, page, totalPages and links array\", function () {",
+                  "    pm.expect(j).to.be.an('object');",
+                  "    pm.expect(j.items).to.be.an('array');",
+                  "    pm.expect(j).to.have.property('page');",
+                  "    pm.expect(j).to.have.property('totalPages');",
+                  "    pm.expect(j.links).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.2 List champions filtered by name (ah, pageSize 2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Content-Type contains application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test(\"Every item name contains 'ah' (case-insensitive)\", function () {",
+                  "    pm.expect(j.items).to.be.an('array');",
+                  "    pm.expect(j.items.length).to.be.above(0);",
+                  "    j.items.forEach(function (c) {",
+                  "        pm.expect(String(c.name).toLowerCase()).to.include('ah');",
+                  "    });",
+                  "});",
+                  "pm.test(\"pageSize is 2\", function () {",
+                  "    pm.expect(j.pageSize).to.eql(2);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions?name=ah&pageSize=2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "ah"
+                },
+                {
+                  "key": "pageSize",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.3 Create champion",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('championName', 'Test Champion ' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Content-Type contains application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test(\"Location header is present\", function () {",
+                  "    pm.expect(pm.response.headers.get('Location')).to.be.a('string').and.not.empty;",
+                  "});",
+                  "pm.test(\"Name matches the generated name and id is saved\", function () {",
+                  "    pm.expect(j.name).to.eql(pm.collectionVariables.get('championName'));",
+                  "    pm.collectionVariables.set('championId', String(j.id));",
+                  "    pm.expect(j.id).to.be.a('number');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{championName}}\",\n  \"title\": \"Test Title\",\n  \"description\": \"Created by the Postman collection tests\",\n  \"imageUrl\": \"https://example.com/test.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.4 Get champion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Content-Type contains application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test(\"Links contain rel 'self'\", function () {",
+                  "    pm.expect(j.links).to.be.an('array');",
+                  "    pm.expect(j.links.some(function (l) { return l.rel === 'self'; })).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.5 Update champion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Content-Type contains application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test(\"Title was updated\", function () {",
+                  "    pm.expect(j && j.title).to.eql('Updated Test Title');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{championName}}\",\n  \"title\": \"Updated Test Title\",\n  \"description\": \"Updated by the Postman collection tests\",\n  \"imageUrl\": \"https://example.com/test.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.6 Champion summary (Ahri)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Content-Type contains application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test(\"Has champion, buildCount, commentCount and latestBuilds\", function () {",
+                  "    pm.expect(j).to.have.property('champion');",
+                  "    pm.expect(j).to.have.property('buildCount');",
+                  "    pm.expect(j).to.have.property('commentCount');",
+                  "    pm.expect(j).to.have.property('latestBuilds');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/1/summary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "1",
+                "summary"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2 Builds",
+      "item": [
+        {
+          "name": "2.1 List builds of champion 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Content-Type contains application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test(\"Body has items array\", function () {",
+                  "    pm.expect(j.items).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/1/builds",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "1",
+                "builds"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.2 List builds of champion 1 filtered by position=Mid",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Content-Type contains application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test(\"Every item has position Mid\", function () {",
+                  "    pm.expect(j.items).to.be.an('array');",
+                  "    pm.expect(j.items.length).to.be.above(0);",
+                  "    j.items.forEach(function (b) {",
+                  "        pm.expect(b.position).to.eql('Mid');",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/1/builds?position=Mid",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "1",
+                "builds"
+              ],
+              "query": [
+                {
+                  "key": "position",
+                  "value": "Mid"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.3 Create build for test champion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Content-Type contains application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test(\"Location header is present\", function () {",
+                  "    pm.expect(pm.response.headers.get('Location')).to.be.a('string').and.not.empty;",
+                  "});",
+                  "pm.test(\"Build belongs to the test champion and id is saved\", function () {",
+                  "    pm.expect(j.championId).to.eql(Number(pm.collectionVariables.get('championId')));",
+                  "    pm.collectionVariables.set('buildId', String(j.id));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}/builds",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}",
+                "builds"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test build\",\n  \"description\": \"A build used by the Postman tests\",\n  \"position\": \"Mid\",\n  \"items\": [\n    3020,\n    3089,\n    3157\n  ],\n  \"summonerSpells\": [\n    \"SummonerFlash\",\n    \"SummonerDot\"\n  ],\n  \"primaryRuneTree\": \"Domination\",\n  \"keystone\": \"Electrocute\",\n  \"secondaryRuneTree\": \"Sorcery\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.4 Get build",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Content-Type contains application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test(\"Returned build id matches buildId\", function () {",
+                  "    pm.expect(j && j.id).to.eql(Number(pm.collectionVariables.get('buildId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}/builds/{{buildId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}",
+                "builds",
+                "{{buildId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.5 Update build",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Content-Type contains application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test(\"Title was updated\", function () {",
+                  "    pm.expect(j && j.title).to.eql('Updated test build');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}/builds/{{buildId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}",
+                "builds",
+                "{{buildId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated test build\",\n  \"description\": \"A build used by the Postman tests\",\n  \"position\": \"Mid\",\n  \"items\": [\n    3020,\n    3089,\n    3157\n  ],\n  \"summonerSpells\": [\n    \"SummonerFlash\",\n    \"SummonerDot\"\n  ],\n  \"primaryRuneTree\": \"Domination\",\n  \"keystone\": \"Electrocute\",\n  \"secondaryRuneTree\": \"Sorcery\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3 Comments",
+      "item": [
+        {
+          "name": "3.1 List comments of champion 1 build 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Content-Type contains application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test(\"Body has items array\", function () {",
+                  "    pm.expect(j.items).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/1/builds/1/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "1",
+                "builds",
+                "1",
+                "comments"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.2 Create comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "pm.test(\"Content-Type contains application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test(\"Location header is present\", function () {",
+                  "    pm.expect(pm.response.headers.get('Location')).to.be.a('string').and.not.empty;",
+                  "});",
+                  "pm.test(\"Comment text is saved and id is stored\", function () {",
+                  "    pm.expect(j.text).to.eql('Great build from Postman');",
+                  "    pm.collectionVariables.set('commentId', String(j.id));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}/builds/{{buildId}}/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}",
+                "builds",
+                "{{buildId}}",
+                "comments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Great build from Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.3 Get comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Content-Type contains application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test(\"Returned comment id matches commentId\", function () {",
+                  "    pm.expect(j && j.id).to.eql(Number(pm.collectionVariables.get('commentId')));",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}/builds/{{buildId}}/comments/{{commentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}",
+                "builds",
+                "{{buildId}}",
+                "comments",
+                "{{commentId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.4 Update comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Content-Type contains application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test(\"Text was updated\", function () {",
+                  "    pm.expect(j && j.text).to.eql('Edited by Postman');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}/builds/{{buildId}}/comments/{{commentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}",
+                "builds",
+                "{{buildId}}",
+                "comments",
+                "{{commentId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Edited by Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4 Error cases",
+      "item": [
+        {
+          "name": "4.1 Champion 99999 does not exist",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test(\"Content-Type is a JSON problem body (contains 'json')\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('json');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/99999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "99999"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.2 Build 3 belongs to champion 2, not champion 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test(\"Content-Type is a JSON problem body (contains 'json')\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('json');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/1/builds/3",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "1",
+                "builds",
+                "3"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.3 Comment 1 belongs to build 1, wrong champion in path",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test(\"Content-Type is a JSON problem body (contains 'json')\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('json');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/2/builds/1/comments/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "2",
+                "builds",
+                "1",
+                "comments",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.4 Malformed JSON body",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Content-Type is a JSON problem body (contains 'json')\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('json');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{bad json",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.5 Missing required fields",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 422\", function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});",
+                  "pm.test(\"Content-Type is a JSON problem body (contains 'json')\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('json');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"X\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.6 Build with the same summoner spell twice",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 422\", function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});",
+                  "pm.test(\"Content-Type is a JSON problem body (contains 'json')\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('json');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/1/builds",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "1",
+                "builds"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test build\",\n  \"description\": \"A build used by the Postman tests\",\n  \"position\": \"Mid\",\n  \"items\": [\n    3020,\n    3089,\n    3157\n  ],\n  \"summonerSpells\": [\n    \"SummonerFlash\",\n    \"SummonerFlash\"\n  ],\n  \"primaryRuneTree\": \"Domination\",\n  \"keystone\": \"Electrocute\",\n  \"secondaryRuneTree\": \"Sorcery\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.7 Build with items as a string",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 400\", function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "pm.test(\"Content-Type is a JSON problem body (contains 'json')\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('json');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/1/builds",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "1",
+                "builds"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Test build\",\n  \"description\": \"A build used by the Postman tests\",\n  \"position\": \"Mid\",\n  \"items\": \"abc\",\n  \"summonerSpells\": [\n    \"SummonerFlash\",\n    \"SummonerDot\"\n  ],\n  \"primaryRuneTree\": \"Domination\",\n  \"keystone\": \"Electrocute\",\n  \"secondaryRuneTree\": \"Sorcery\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.8 Duplicate champion name (Ahri)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 409\", function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "pm.test(\"Content-Type is a JSON problem body (contains 'json')\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('json');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ahri\",\n  \"title\": \"Test Title\",\n  \"description\": \"Created by the Postman collection tests\",\n  \"imageUrl\": \"https://example.com/test.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5 Cleanup (deletes)",
+      "item": [
+        {
+          "name": "5.1 Delete comment",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}/builds/{{buildId}}/comments/{{commentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}",
+                "builds",
+                "{{buildId}}",
+                "comments",
+                "{{commentId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.2 Delete same comment again",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test(\"Content-Type is a JSON problem body (contains 'json')\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('json');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}/builds/{{buildId}}/comments/{{commentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}",
+                "builds",
+                "{{buildId}}",
+                "comments",
+                "{{commentId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.3 Delete build",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}/builds/{{buildId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}",
+                "builds",
+                "{{buildId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.4 Delete champion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 204\", function () {",
+                  "    pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.5 Get deleted champion",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 404\", function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "pm.test(\"Content-Type is a JSON problem body (contains 'json')\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('json');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

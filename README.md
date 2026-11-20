@@ -90,18 +90,27 @@ Kiekvienam pagrindiniam objektui bus realizuotos penkios operacijos: sukūrimas,
 
 Komentarų keliai apima visus tris hierarchijos objektus. Serveris tikrins, ar build’as priklauso nurodytam čempionui, o komentaras – nurodytam build’ui.
 
+Papildomai:
+
+- **Puslapiavimas** – visi sąrašų metodai priima `page` ir `pageSize` (1–50) parametrus ir grąžina `items`, `page`, `pageSize`, `totalCount`, `totalPages`.
+- **Filtravimas** – čempionai pagal pavadinimą (`?name=ah`), build’ai pagal poziciją (`?position=Mid`), komentarai pagal tekstą (`?search=zhonya`).
+- **Hypermedia** – kiekvienas objektas ir sąrašas turi `links` masyvą su susijusiais keliais ir leidžiamais veiksmais (`self`, `update`, `delete`, `builds`, `comments`, `next`, `previous` ir kt.).
+- **Suvestinė iš kelių esybių** – `GET /api/champions/{championId}/summary` grąžina čempioną, jo build’ų ir komentarų skaičių, build’ų pasiskirstymą pagal pozicijas ir naujausius build’us.
+
+Atsako kodai: `200` – sėkminga užklausa, `201` – sukurta (su `Location` antrašte), `204` – ištrinta, `400` – neperskaitomas JSON arba netinkami reikšmių tipai, `404` – objektas nerastas arba nepriklauso nurodytam tėviniam objektui, `409` – toks čempionas jau yra, `422` – JSON teisingas, bet reikšmės neatitinka taisyklių.
+
 API grąžins duomenis JSON formatu ir užklausos rezultatą atitinkančius HTTP būsenos kodus. Visiems prieigos taškams bus parengtas užklausų rinkinys testavimui, o kiekvieno pagrindinio objekto lentelė bus užpildyta bent penkiais prasmingais įrašais.
 
 ## 3. Pasirinktos ir numatomos technologijos
 
-Frontend ir backend technologijos pasirinktos atsižvelgiant į patirtį su kitais projektais. Duomenų bazei ir prieigai prie jos kol kas siūlomi PostgreSQL ir Entity Framework Core.
+Frontend ir backend technologijos pasirinktos atsižvelgiant į patirtį su kitais projektais. Duomenų bazei pasirinkta SQLite, prieigai prie jos – Entity Framework Core.
 
 | Sistemos dalis | Technologija | Pasirinkimo pagrindimas |
 | --- | --- | --- |
 | Kliento dalis | **React ir TypeScript** | React komponentai leis kurti ir pakartotinai naudoti čempionų, build’ų bei komentarų sąsajos elementus. TypeScript padės aprašyti API duomenų struktūras ir aptikti tipų klaidas kuriant programą. |
 | Serverio dalis | **C# ir ASP.NET Core** | Bus naudojami REST API, duomenų tikrinimui, autentifikacijai ir autorizacijai realizuoti. Šios technologijos jau naudojamos kituose projektuose. |
-| Duomenų bazė | **PostgreSQL** | Reliacinė duomenų bazė tinka čempionų, build’ų, komentarų ir naudotojų ryšiams saugoti bei duomenų vientisumui užtikrinti. |
-| Prieiga prie duomenų bazės | **Entity Framework Core** | Leis aprašyti duomenų modelį C# klasėmis, vykdyti užklausas ir valdyti schemos pakeitimus migracijomis. PostgreSQL integracijai numatomas Npgsql teikėjas. |
+| Duomenų bazė | **SQLite** | Reliacinė duomenų bazė, laikoma viename faile ir nereikalaujanti atskiro serverio. Užtenka šios sistemos apkrovai, palaiko išorinius raktus ir kaskadinį trynimą. Esant daug lygiagrečių rašymų, tinkamesnė būtų PostgreSQL. |
+| Prieiga prie duomenų bazės | **Entity Framework Core** | Duomenų modelis aprašomas C# klasėmis. Paleidus programą, duomenų bazė sukuriama ir užpildoma pradiniais duomenimis automatiškai. |
 
 Autentifikacijai numatoma naudoti JWT. Prieigos žetonai galios trumpai, o ilgesniam prisijungimo palaikymui bus naudojami atnaujinimo žetonai. Atnaujinant prieigą, atnaujinimo žetonas bus pakeičiamas nauju, o panaudotas žetonas taps nebegaliojantis. Atsijungus, sesijos žetonai turės būti panaikinami arba pažymimi nebegaliojančiais.
 
@@ -113,8 +122,21 @@ Numatomos trys sistemos dalys:
 
 1. **Kliento aplikacija** – React ir TypeScript grafinė sąsaja, vykdoma naudotojo naršyklėje.
 2. **REST API** – ASP.NET Core serverio aplikacija, vykdanti užklausas, tikrinanti teises ir dirbanti su duomenų baze.
-3. **Duomenų bazė** – PostgreSQL, sauganti čempionus, build’us, komentarus, naudotojų paskyras ir autentifikacijos sesijų duomenis.
+3. **Duomenų bazė** – SQLite, sauganti čempionus, build’us, komentarus, naudotojų paskyras ir autentifikacijos sesijų duomenis.
 
 Kliento aplikacija ir REST API bus talpinamos debesijos aplinkoje ir pasiekiamos internetu. Naršyklė gaus kliento aplikacijos failus iš frontend talpinimo paslaugos, o aplikacija kreipsis į REST API per HTTPS. Prie duomenų bazės jungsis serverio aplikacija; naršyklė tiesioginės prieigos prie jos neturės.
 
 **Diegimo diagrama bus pridėta vėliau.** Ji bus parengta pagal UML standartą, pasirinkus debesijos tiekėją ir konkretų sistemos dalių talpinimo būdą. Diagramoje bus parodytas naudotojo įrenginys su naršykle, frontend talpinimo aplinka, API vykdymo aplinka, duomenų bazė ir jų ryšiai.
+
+## 5. Paleidimas
+
+Reikia .NET 10 SDK.
+
+```bash
+cd backend
+dotnet run --urls http://localhost:5224
+```
+
+- Duomenų bazės failas `lolbuilds.db` sukuriamas ir užpildomas automatiškai. Norint atkurti pradinius duomenis, failą užtenka ištrinti.
+- OpenAPI specifikacija ir Swagger UI: `http://localhost:5224/swagger`.
+- Postman užklausų rinkinys su testais: `postman/LolBuilds.postman_collection.json`. Paleidimas: `postman collection run postman/LolBuilds.postman_collection.json`.
