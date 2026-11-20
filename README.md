@@ -147,12 +147,20 @@ Kliento aplikacija ir REST API bus talpinamos debesijos aplinkoje ir pasiekiamos
 
 ## 5. Paleidimas
 
-Reikia .NET 10 SDK.
+Reikia .NET 10 SDK ir Node.js.
 
 ```bash
+# API
 cd backend
 dotnet run --urls http://localhost:5224
+
+# Kliento aplikacija (kitame terminale)
+cd frontend
+npm install
+npm run dev
 ```
+
+Kliento aplikacija pasiekiama adresu `http://localhost:5173`. API adresas nurodomas aplinkos kintamuoju `VITE_API_URL` (numatytasis `http://localhost:5224`).
 
 - Duomenų bazės failas `lolbuilds.db` sukuriamas ir užpildomas automatiškai. Norint atkurti pradinius duomenis, failą užtenka ištrinti.
 - OpenAPI specifikacija ir Swagger UI: `http://localhost:5224/swagger`.

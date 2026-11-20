@@ -37,7 +37,9 @@ public class ChampionRequest
     [Required, StringLength(2000, MinimumLength = 10)]
     public string Description { get; set; } = "";
 
-    [Required, StringLength(300)]
+    // A normal URL/path, or an uploaded picture stored as a data URL ("data:image/jpeg;base64,...").
+    // The frontend shrinks uploads to 128x128, so 100 000 characters is plenty.
+    [Required, StringLength(100_000)]
     public string ImageUrl { get; set; } = "";
 }
 

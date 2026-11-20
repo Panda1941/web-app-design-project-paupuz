@@ -1,0 +1,777 @@
+{
+ "items": [
+  {
+   "id": 3174,
+   "name": "Armored Advance",
+   "gold": 1200,
+   "boots": true
+  },
+  {
+   "id": 3006,
+   "name": "Berserker's Greaves",
+   "gold": 1100,
+   "boots": true
+  },
+  {
+   "id": 3009,
+   "name": "Boots of Swiftness",
+   "gold": 1000,
+   "boots": true
+  },
+  {
+   "id": 3173,
+   "name": "Chainlaced Crushers",
+   "gold": 1250,
+   "boots": true
+  },
+  {
+   "id": 3171,
+   "name": "Crimson Lucidity",
+   "gold": 900,
+   "boots": true
+  },
+  {
+   "id": 3008,
+   "name": "Gluttonous Greaves",
+   "gold": 1100,
+   "boots": true
+  },
+  {
+   "id": 3168,
+   "name": "Immortal Path",
+   "gold": 1100,
+   "boots": true
+  },
+  {
+   "id": 3158,
+   "name": "Ionian Boots of Lucidity",
+   "gold": 900,
+   "boots": true
+  },
+  {
+   "id": 3111,
+   "name": "Mercury's Treads",
+   "gold": 1250,
+   "boots": true
+  },
+  {
+   "id": 3047,
+   "name": "Plated Steelcaps",
+   "gold": 1200,
+   "boots": true
+  },
+  {
+   "id": 3020,
+   "name": "Sorcerer's Shoes",
+   "gold": 1100,
+   "boots": true
+  },
+  {
+   "id": 3175,
+   "name": "Spellslinger's Shoes",
+   "gold": 1100,
+   "boots": true
+  },
+  {
+   "id": 3170,
+   "name": "Swiftmarch",
+   "gold": 1000,
+   "boots": true
+  },
+  {
+   "id": 3504,
+   "name": "Ardent Censer",
+   "gold": 2200,
+   "boots": false
+  },
+  {
+   "id": 6696,
+   "name": "Axiom Arc",
+   "gold": 2750,
+   "boots": false
+  },
+  {
+   "id": 2524,
+   "name": "Bandlepipes",
+   "gold": 2300,
+   "boots": false
+  },
+  {
+   "id": 3102,
+   "name": "Banshee's Veil",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 2520,
+   "name": "Bastionbreaker",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 3071,
+   "name": "Black Cleaver",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 2503,
+   "name": "Blackfire Torch",
+   "gold": 2800,
+   "boots": false
+  },
+  {
+   "id": 3153,
+   "name": "Blade of The Ruined King",
+   "gold": 3200,
+   "boots": false
+  },
+  {
+   "id": 8010,
+   "name": "Bloodletter's Curse",
+   "gold": 2900,
+   "boots": false
+  },
+  {
+   "id": 3072,
+   "name": "Bloodthirster",
+   "gold": 3400,
+   "boots": false
+  },
+  {
+   "id": 6609,
+   "name": "Chempunk Chainsword",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 4629,
+   "name": "Cosmic Drive",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 3137,
+   "name": "Cryptbloom",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 6621,
+   "name": "Dawncore",
+   "gold": 2500,
+   "boots": false
+  },
+  {
+   "id": 3742,
+   "name": "Dead Man's Plate",
+   "gold": 2900,
+   "boots": false
+  },
+  {
+   "id": 6333,
+   "name": "Death's Dance",
+   "gold": 3300,
+   "boots": false
+  },
+  {
+   "id": 2510,
+   "name": "Dusk and Dawn",
+   "gold": 3100,
+   "boots": false
+  },
+  {
+   "id": 6620,
+   "name": "Echoes of Helia",
+   "gold": 2200,
+   "boots": false
+  },
+  {
+   "id": 6692,
+   "name": "Eclipse",
+   "gold": 2900,
+   "boots": false
+  },
+  {
+   "id": 3814,
+   "name": "Edge of Night",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 2517,
+   "name": "Endless Hunger",
+   "gold": 3100,
+   "boots": false
+  },
+  {
+   "id": 3508,
+   "name": "Essence Reaver",
+   "gold": 3050,
+   "boots": false
+  },
+  {
+   "id": 3073,
+   "name": "Experimental Hexplate",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 2512,
+   "name": "Fiendhunter Bolts",
+   "gold": 2650,
+   "boots": false
+  },
+  {
+   "id": 4401,
+   "name": "Force of Nature",
+   "gold": 2800,
+   "boots": false
+  },
+  {
+   "id": 3110,
+   "name": "Frozen Heart",
+   "gold": 2500,
+   "boots": false
+  },
+  {
+   "id": 3026,
+   "name": "Guardian Angel",
+   "gold": 3200,
+   "boots": false
+  },
+  {
+   "id": 3124,
+   "name": "Guinsoo's Rageblade",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 3084,
+   "name": "Heartsteel",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 2523,
+   "name": "Hexoptics C44",
+   "gold": 2800,
+   "boots": false
+  },
+  {
+   "id": 3146,
+   "name": "Hextech Gunblade",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 3152,
+   "name": "Hextech Rocketbelt",
+   "gold": 2650,
+   "boots": false
+  },
+  {
+   "id": 6664,
+   "name": "Hollow Radiance",
+   "gold": 2800,
+   "boots": false
+  },
+  {
+   "id": 4628,
+   "name": "Horizon Focus",
+   "gold": 2700,
+   "boots": false
+  },
+  {
+   "id": 6697,
+   "name": "Hubris",
+   "gold": 2800,
+   "boots": false
+  },
+  {
+   "id": 3181,
+   "name": "Hullbreaker",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 6662,
+   "name": "Iceborn Gauntlet",
+   "gold": 2900,
+   "boots": false
+  },
+  {
+   "id": 6673,
+   "name": "Immortal Shieldbow",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 4005,
+   "name": "Imperial Mandate",
+   "gold": 2400,
+   "boots": false
+  },
+  {
+   "id": 3031,
+   "name": "Infinity Edge",
+   "gold": 3500,
+   "boots": false
+  },
+  {
+   "id": 6665,
+   "name": "Jak'Sho, The Protean",
+   "gold": 3200,
+   "boots": false
+  },
+  {
+   "id": 2504,
+   "name": "Kaenic Rookern",
+   "gold": 2900,
+   "boots": false
+  },
+  {
+   "id": 3109,
+   "name": "Knight's Vow",
+   "gold": 2300,
+   "boots": false
+  },
+  {
+   "id": 6672,
+   "name": "Kraken Slayer",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 6653,
+   "name": "Liandry's Torment",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 3100,
+   "name": "Lich Bane",
+   "gold": 2900,
+   "boots": false
+  },
+  {
+   "id": 3190,
+   "name": "Locket of the Iron Solari",
+   "gold": 2200,
+   "boots": false
+  },
+  {
+   "id": 3036,
+   "name": "Lord Dominik's Regards",
+   "gold": 3300,
+   "boots": false
+  },
+  {
+   "id": 6655,
+   "name": "Luden's Echo",
+   "gold": 2750,
+   "boots": false
+  },
+  {
+   "id": 3118,
+   "name": "Malignance",
+   "gold": 2700,
+   "boots": false
+  },
+  {
+   "id": 3004,
+   "name": "Manamune",
+   "gold": 2900,
+   "boots": false
+  },
+  {
+   "id": 3156,
+   "name": "Maw of Malmortius",
+   "gold": 3100,
+   "boots": false
+  },
+  {
+   "id": 3139,
+   "name": "Mercurial Scimitar",
+   "gold": 3200,
+   "boots": false
+  },
+  {
+   "id": 3222,
+   "name": "Mikael's Blessing",
+   "gold": 2300,
+   "boots": false
+  },
+  {
+   "id": 6617,
+   "name": "Moonstone Renewer",
+   "gold": 2200,
+   "boots": false
+  },
+  {
+   "id": 3165,
+   "name": "Morellonomicon",
+   "gold": 2850,
+   "boots": false
+  },
+  {
+   "id": 3033,
+   "name": "Mortal Reminder",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 3115,
+   "name": "Nashor's Tooth",
+   "gold": 2900,
+   "boots": false
+  },
+  {
+   "id": 6675,
+   "name": "Navori Flickerblade",
+   "gold": 2650,
+   "boots": false
+  },
+  {
+   "id": 2501,
+   "name": "Overlord's Bloodmail",
+   "gold": 3300,
+   "boots": false
+  },
+  {
+   "id": 3046,
+   "name": "Phantom Dancer",
+   "gold": 2650,
+   "boots": false
+  },
+  {
+   "id": 6698,
+   "name": "Profane Hydra",
+   "gold": 2850,
+   "boots": false
+  },
+  {
+   "id": 2525,
+   "name": "Protoplasm Harness",
+   "gold": 2600,
+   "boots": false
+  },
+  {
+   "id": 3089,
+   "name": "Rabadon's Deathcap",
+   "gold": 3500,
+   "boots": false
+  },
+  {
+   "id": 3143,
+   "name": "Randuin's Omen",
+   "gold": 2700,
+   "boots": false
+  },
+  {
+   "id": 3094,
+   "name": "Rapid Firecannon",
+   "gold": 2650,
+   "boots": false
+  },
+  {
+   "id": 3074,
+   "name": "Ravenous Hydra",
+   "gold": 3300,
+   "boots": false
+  },
+  {
+   "id": 3107,
+   "name": "Redemption",
+   "gold": 2300,
+   "boots": false
+  },
+  {
+   "id": 4633,
+   "name": "Riftmaker",
+   "gold": 3100,
+   "boots": false
+  },
+  {
+   "id": 6657,
+   "name": "Rod of Ages",
+   "gold": 2600,
+   "boots": false
+  },
+  {
+   "id": 3085,
+   "name": "Runaan's Hurricane",
+   "gold": 2650,
+   "boots": false
+  },
+  {
+   "id": 3116,
+   "name": "Rylai's Crystal Scepter",
+   "gold": 2600,
+   "boots": false
+  },
+  {
+   "id": 6695,
+   "name": "Serpent's Fang",
+   "gold": 2500,
+   "boots": false
+  },
+  {
+   "id": 6694,
+   "name": "Serylda's Grudge",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 4645,
+   "name": "Shadowflame",
+   "gold": 3200,
+   "boots": false
+  },
+  {
+   "id": 2065,
+   "name": "Shurelya's Battlesong",
+   "gold": 2200,
+   "boots": false
+  },
+  {
+   "id": 3161,
+   "name": "Spear of Shojin",
+   "gold": 3100,
+   "boots": false
+  },
+  {
+   "id": 3065,
+   "name": "Spirit Visage",
+   "gold": 2700,
+   "boots": false
+  },
+  {
+   "id": 6616,
+   "name": "Staff of Flowing Water",
+   "gold": 2250,
+   "boots": false
+  },
+  {
+   "id": 3087,
+   "name": "Statikk Shiv",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 3053,
+   "name": "Sterak's Gage",
+   "gold": 3200,
+   "boots": false
+  },
+  {
+   "id": 3095,
+   "name": "Stormrazor",
+   "gold": 3200,
+   "boots": false
+  },
+  {
+   "id": 4646,
+   "name": "Stormsurge",
+   "gold": 2800,
+   "boots": false
+  },
+  {
+   "id": 6631,
+   "name": "Stridebreaker",
+   "gold": 3300,
+   "boots": false
+  },
+  {
+   "id": 6610,
+   "name": "Sundered Sky",
+   "gold": 3100,
+   "boots": false
+  },
+  {
+   "id": 3068,
+   "name": "Sunfire Aegis",
+   "gold": 2800,
+   "boots": false
+  },
+  {
+   "id": 3302,
+   "name": "Terminus",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 6676,
+   "name": "The Collector",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 3075,
+   "name": "Thornmail",
+   "gold": 2450,
+   "boots": false
+  },
+  {
+   "id": 3748,
+   "name": "Titanic Hydra",
+   "gold": 3300,
+   "boots": false
+  },
+  {
+   "id": 3078,
+   "name": "Trinity Force",
+   "gold": 3333,
+   "boots": false
+  },
+  {
+   "id": 3179,
+   "name": "Umbral Glaive",
+   "gold": 2800,
+   "boots": false
+  },
+  {
+   "id": 2502,
+   "name": "Unending Despair",
+   "gold": 2800,
+   "boots": false
+  },
+  {
+   "id": 3135,
+   "name": "Void Staff",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 6699,
+   "name": "Voltaic Cyclosword",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 3083,
+   "name": "Warmog's Armor",
+   "gold": 3100,
+   "boots": false
+  },
+  {
+   "id": 3091,
+   "name": "Wit's End",
+   "gold": 2800,
+   "boots": false
+  },
+  {
+   "id": 3142,
+   "name": "Youmuu's Ghostblade",
+   "gold": 2800,
+   "boots": false
+  },
+  {
+   "id": 3032,
+   "name": "Yun Tal Wildarrows",
+   "gold": 3000,
+   "boots": false
+  },
+  {
+   "id": 3050,
+   "name": "Zeke's Convergence",
+   "gold": 2200,
+   "boots": false
+  },
+  {
+   "id": 3157,
+   "name": "Zhonya's Hourglass",
+   "gold": 3250,
+   "boots": false
+  }
+ ],
+ "summonerSpells": [
+  {
+   "key": "SummonerFlash",
+   "name": "Flash"
+  },
+  {
+   "key": "SummonerDot",
+   "name": "Ignite"
+  },
+  {
+   "key": "SummonerTeleport",
+   "name": "Teleport"
+  },
+  {
+   "key": "SummonerHeal",
+   "name": "Heal"
+  },
+  {
+   "key": "SummonerBarrier",
+   "name": "Barrier"
+  },
+  {
+   "key": "SummonerExhaust",
+   "name": "Exhaust"
+  },
+  {
+   "key": "SummonerHaste",
+   "name": "Ghost"
+  },
+  {
+   "key": "SummonerBoost",
+   "name": "Cleanse"
+  },
+  {
+   "key": "SummonerSmite",
+   "name": "Smite"
+  }
+ ],
+ "runeTrees": [
+  {
+   "name": "Precision",
+   "keystones": [
+    "Press the Attack",
+    "Lethal Tempo",
+    "Fleet Footwork",
+    "Conqueror"
+   ]
+  },
+  {
+   "name": "Domination",
+   "keystones": [
+    "Electrocute",
+    "Dark Harvest",
+    "Hail of Blades"
+   ]
+  },
+  {
+   "name": "Sorcery",
+   "keystones": [
+    "Summon Aery",
+    "Arcane Comet",
+    "Stormraider's Surge",
+    "Deathfire Touch"
+   ]
+  },
+  {
+   "name": "Resolve",
+   "keystones": [
+    "Grasp of the Undying",
+    "Aftershock",
+    "Guardian"
+   ]
+  },
+  {
+   "name": "Inspiration",
+   "keystones": [
+    "Glacial Augment",
+    "Unsealed Spellbook",
+    "First Strike"
+   ]
+  }
+ ],
+ "positions": [
+  "Top",
+  "Jungle",
+  "Mid",
+  "Bot",
+  "Support"
+ ]
+}
