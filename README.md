@@ -2,7 +2,7 @@
 
 Saityno taikomųjų programų projektavimo modulio projektas – „League of Legends“ čempionų build’ų kūrimo ir aptarimo platforma.
 
-- **Kliento aplikacija:** https://lol-builds.up.railway.app
+- **Front-end:** https://lol-builds.up.railway.app
 - **REST API:** https://api-production-3b89593d.up.railway.app/api/v1/champions
 - **Swagger UI:** https://api-production-3b89593d.up.railway.app/swagger
 - **OpenAPI specifikacija:** [`api-spec.yaml`](api-spec.yaml)
@@ -22,11 +22,11 @@ Demonstraciniai naudotojai (slaptažodis `Password123!`): `admin` (Admin), `fake
 
 ### 1.1. Sistemos paskirtis
 
-„League of Legends“ žaidėjai tam pačiam čempionui gali naudoti skirtingus item’us, summoner spell’us ir runas, priklausomai nuo žaidimo pozicijos bei pasirinktos strategijos. Norint pasidalinti tokiu pasirinkimu, reikia pateikti ne tik patį build’ą, bet ir paaiškinti, kada ir kaip jį naudoti.
+„League of Legends“ žaidėjai tam pačiam čempionui gali naudoti skirtingus item’us, summoner spell’us ir runas, priklausomai nuo žaidimo pozicijos bei pasirinktos strategijos. Dalinantis build’u, svarbu ne tik pats rinkinys, bet ir paaiškinimas, kada ir kaip jį naudoti.
 
 Projekto tikslas – sukurti internetinę platformą, kurioje naudotojai galėtų kurti čempionams skirtus build’us, dalintis jais ir aptarti juos komentaruose. Build’ą sudaro pavadinimas, aprašymas, žaidimo pozicija, pasirinkti item’ai, summoner spell’ai ir runos.
 
-Čempionai iš anksto įkelti į sistemą, o jų informaciją valdo administratorius. Build’us ir komentarus kuria registruoti naudotojai. Neprisijungę lankytojai gali peržiūrėti viešai pateiktą turinį.
+Čempionai iš anksto įkelti į sistemą, o jų informaciją valdo administratorius. Build’us ir komentarus kuria registruoti naudotojai. Neprisijungę lankytojai gali tik peržiūrėti turinį.
 
 ### 1.2. Taikomosios srities objektai
 
@@ -35,7 +35,7 @@ Sistemoje yra trys pagrindiniai objektai:
 | Objektas | Paskirtis ir pagrindinė informacija |
 | --- | --- |
 | **Čempionas (Champion)** | Žaidimo čempionas, kuriam kuriami build’ai. Saugomas jo pavadinimas, titulas, aprašymas ir paveikslėlio nuoroda. |
-| **Build’as (Build)** | Konkrečiam čempionui skirtas naudotojo sukurtas build’as. Saugomas pavadinimas, aprašymas, žaidimo pozicija, pasirinkti item’ai, summoner spell’ai, runos, autorius ir sukūrimo bei atnaujinimo laikas. |
+| **Build’as (Build)** | Naudotojo sukurtas build’as konkrečiam čempionui. Saugomas pavadinimas, aprašymas, žaidimo pozicija, pasirinkti item’ai, summoner spell’ai, runos, autorius ir sukūrimo bei atnaujinimo laikas. |
 | **Komentaras (Comment)** | Naudotojo atsiliepimas arba klausimas po konkrečiu build’u. Saugomas tekstas, autorius ir sukūrimo bei atnaujinimo laikas. |
 
 Objektai sudaro hierarchiją **Champion → Build → Comment**:
@@ -43,9 +43,9 @@ Objektai sudaro hierarchiją **Champion → Build → Comment**:
 - Vienam čempionui gali priklausyti daug build’ų. Kiekvienas build’as priklauso vienam čempionui.
 - Vienam build’ui gali priklausyti daug komentarų. Kiekvienas komentaras priklauso vienam build’ui.
 
-Naudotojų paskyros saugomos atskirai ir naudojamos autentifikacijai, autorizacijai bei turinio autorystei nustatyti. Jos nėra vienas iš trijų pagrindinių taikomosios srities objektų.
+Naudotojų paskyros saugomos atskirai ir naudojamos autentifikacijai, autorizacijai bei turinio autorystei nustatyti. Tai nėra vienas iš trijų pagrindinių objektų.
 
-Item’ai, summoner spell’ai ir runos pasirenkami iš iš anksto parengto katalogo. Pasirinkta kombinacija saugoma kaip build’o dalis; atskiros jų CRUD valdymo funkcijos į pradinę projekto apimtį neįtraukiamos.
+Item’ai, summoner spell’ai ir runos pasirenkami iš fiksuoto sąrašo. Jie saugomi kaip build’o dalis, atskirai jų kurti ar redaguoti negalima.
 
 ### 1.3. Funkciniai reikalavimai
 
@@ -61,7 +61,7 @@ Neprisijungęs naudotojas gali:
 
 #### Registruotas naudotojas
 
-Prisijungęs naudotojas gali naudotis svečiui prieinamomis turinio peržiūros funkcijomis ir papildomai:
+Prisijungęs naudotojas gali viską, ką ir svečias, ir papildomai:
 
 1. Sukurti pasirinktam čempionui skirtą build’ą: nurodyti jo pavadinimą, aprašymą ir žaidimo poziciją, pasirinkti item’us, summoner spell’us bei runas.
 2. Redaguoti ir pašalinti savo sukurtus build’us.
@@ -69,11 +69,11 @@ Prisijungęs naudotojas gali naudotis svečiui prieinamomis turinio peržiūros 
 4. Redaguoti ir pašalinti savo komentarus.
 5. Atsijungti nuo sistemos.
 
-Registruotas naudotojas negali redaguoti ar pašalinti kitų naudotojų build’ų ir komentarų. Šios teisės tikrinamos serverio pusėje pagal prisijungusio naudotojo identifikatorių.
+Registruotas naudotojas negali redaguoti ar pašalinti kitų naudotojų build’ų ir komentarų. Tai tikrinama back-end’e pagal naudotojo ID iš žetono.
 
 #### Administratorius
 
-Administratorius gali naudotis registruotam naudotojui prieinamomis funkcijomis ir papildomai:
+Administratorius gali viską, ką ir registruotas naudotojas, ir papildomai:
 
 1. Pridėti naują čempioną.
 2. Redaguoti čempiono informaciją.
@@ -90,29 +90,27 @@ Diagramos šaltinis: [`docs/deployment-diagram.drawio`](docs/deployment-diagram.
 
 Sistemą sudaro trys dalys:
 
-1. **Kliento aplikacija** – React ir TypeScript grafinė sąsaja, vykdoma naudotojo naršyklėje. Jos failus aptarnauja Railway paslauga `web` (Caddy serveris).
-2. **REST API** – ASP.NET Core serverio aplikacija (Railway paslauga `api`), vykdanti užklausas, tikrinanti teises ir dirbanti su duomenų baze.
+1. **Front-end** – React ir TypeScript grafinė sąsaja, vykdoma naudotojo naršyklėje. Jos failus aptarnauja Railway paslauga `web` (Caddy serveris).
+2. **Back-end (REST API)** – ASP.NET Core aplikacija (Railway paslauga `api`), vykdanti užklausas, tikrinanti teises ir dirbanti su duomenų baze.
 3. **Duomenų bazė** – SQLite failas Railway tome (volume), prijungtame prie `api` paslaugos. Joje saugomi čempionai, build’ai, komentarai, naudotojų paskyros ir atnaujinimo žetonai.
 
-Naršyklė gauna kliento aplikacijos failus iš `web` paslaugos, o aplikacija kreipiasi į REST API per HTTPS, perduodama JWT žetoną `Authorization` antraštėje. Prie duomenų bazės jungiasi tik serverio aplikacija; naršyklė tiesioginės prieigos prie jos neturi. Abi paslaugos diegiamos automatiškai iš `main` šakos.
+Naršyklė gauna front-end’o failus iš `web` paslaugos, o front-end’as kreipiasi į REST API per HTTPS, perduodama JWT žetoną `Authorization` antraštėje. Prie duomenų bazės jungiasi tik back-end’as; naršyklė tiesioginės prieigos prie jos neturi. Abi paslaugos diegiamos iš `main` šakos.
 
 | Dalis | Adresas | Vykdymo aplinka |
 | --- | --- | --- |
-| Kliento aplikacija | https://lol-builds.up.railway.app | Railway paslauga `web`: sukompiliuoti React failai, aptarnaujami Caddy serverio |
-| REST API | https://api-production-3b89593d.up.railway.app | Railway paslauga `api`: ASP.NET Core (.NET 10, Kestrel) |
+| Front-end | https://lol-builds.up.railway.app | Railway paslauga `web`: sukompiliuoti React failai, aptarnaujami Caddy serverio |
+| Back-end (REST API) | https://api-production-3b89593d.up.railway.app | Railway paslauga `api`: ASP.NET Core (.NET 10, Kestrel) |
 | API dokumentacija | https://api-production-3b89593d.up.railway.app/swagger | Swagger UI |
-| Duomenų bazė | – | SQLite failas `/data/lolbuilds.db` Railway tome (volume), prijungtame prie `api` paslaugos |
+| Duomenų bazė | – | SQLite failas `/data/lolbuilds-v2.db` Railway tome (volume), prijungtame prie `api` paslaugos |
 
-Produkcinėje aplinkoje konfigūracija perduodama aplinkos kintamaisiais: `Jwt__Key` (žetonų pasirašymo raktas), `ConnectionStrings__Default` (duomenų bazės kelias), `Cors__AllowedOrigins` (leidžiamas kliento aplikacijos adresas) ir `VITE_API_URL` (API adresas kliento aplikacijai).
-
-Produkcinėje aplinkoje konfigūracija perduodama aplinkos kintamaisiais: `Jwt__Key` (žetonų pasirašymo raktas), `ConnectionStrings__Default` (duomenų bazės kelias), `Cors__AllowedOrigins` (leidžiamas kliento aplikacijos adresas) ir `VITE_API_URL` (API adresas kliento aplikacijai).
+Produkcinėje aplinkoje konfigūracija perduodama aplinkos kintamaisiais: `Jwt__Key` (žetonų pasirašymo raktas), `ConnectionStrings__Default` (duomenų bazės kelias), `Cors__AllowedOrigins` (leidžiamas front-end’o adresas) ir `VITE_API_URL` (API adresas front-end’ui).
 
 ### 2.2. Pasirinktos technologijos
 
 | Sistemos dalis | Technologija | Pasirinkimo pagrindimas |
 | --- | --- | --- |
-| Kliento dalis | **React ir TypeScript** | React komponentai leidžia kurti ir pakartotinai naudoti čempionų, build’ų bei komentarų sąsajos elementus. TypeScript padeda aprašyti API duomenų struktūras ir aptikti tipų klaidas kuriant programą. |
-| Serverio dalis | **C# ir ASP.NET Core** | Naudojami REST API, duomenų tikrinimui, autentifikacijai ir autorizacijai realizuoti. Šios technologijos jau naudojamos kituose projektuose. |
+| Front-end | **React ir TypeScript** | React komponentai leidžia kurti ir pakartotinai naudoti čempionų, build’ų bei komentarų sąsajos elementus. TypeScript padeda aprašyti API duomenų struktūras ir aptikti tipų klaidas kuriant programą. |
+| Back-end | **C# ir ASP.NET Core** | Juo realizuotas REST API, validacija, autentifikacija ir autorizacija. Su C# ir ASP.NET Core jau turėjau patirties. |
 | Duomenų bazė | **SQLite** | Reliacinė duomenų bazė, laikoma viename faile ir nereikalaujanti atskiro serverio. Užtenka šios sistemos apkrovai, palaiko išorinius raktus ir kaskadinį trynimą. Esant daug lygiagrečių rašymų, tinkamesnė būtų PostgreSQL. |
 | Prieiga prie duomenų bazės | **Entity Framework Core** | Duomenų modelis aprašomas C# klasėmis. Paleidus programą, duomenų bazė sukuriama ir užpildoma pradiniais duomenimis automatiškai. |
 
@@ -129,35 +127,35 @@ Naudojami JWT prieigos žetonai ir atnaujinimo (refresh) žetonai.
 | GET | `/api/v1/auth/me` | Prisijungusio naudotojo duomenys. |
 
 - **Prieigos žetonas** – JWT, galioja 15 min., siunčiamas antraštėje `Authorization: Bearer <žetonas>`. Jame saugomi naudotojo ID (`sub`), vardas (`unique_name`), rolė (`role`), unikalus ID (`jti`), galiojimo laikas (`exp`), išdavėjas (`iss`) ir auditorija (`aud`). Pasirašomas HMAC-SHA256 algoritmu slaptu raktu `Jwt:Key`, kuris produkcinėje aplinkoje nustatomas aplinkos kintamuoju `Jwt__Key`.
-- **Atnaujinimo žetonas** – atsitiktinė 64 baitų eilutė, galioja 7 d. Duomenų bazėje saugoma tik jo SHA-256 maiša. Kiekvieną kartą atnaujinant senas žetonas panaikinamas ir išduodamas naujas (rotacija). Jei panaudotas žetonas pateikiamas dar kartą, panaikinami visi to naudotojo žetonai.
+- **Atnaujinimo žetonas** – atsitiktinė 64 baitų eilutė, galioja 7 d. Duomenų bazėje saugoma tik jo SHA-256 hash. Kiekvieną kartą atnaujinant senas žetonas panaikinamas ir išduodamas naujas (rotacija). Jei panaudotas žetonas pateikiamas dar kartą, panaikinami visi to naudotojo žetonai.
 - **Rolės** – svečias (be žetono), `User` ir `Admin`. Čempionus kurti, redaguoti ir šalinti gali tik `Admin`. Build’us ir komentarus kuria prisijungę naudotojai; redaguoti gali tik autorius, šalinti – autorius arba administratorius. Autorystė tikrinama serverio pusėje pagal žetone esantį naudotojo ID.
 - **Atsako kodai** – `401`, kai žetono nėra, jis netinkamas ar pasibaigęs; `403`, kai naudotojas prisijungęs, bet neturi teisių.
 
 ## 3. Naudotojo sąsajos projektas
 
-Kiekvienam pagrindiniam langui pateiktas projektuotas wireframe’as ir jį atitinkanti realizacijos iškarpa.
+Kiekvienam pagrindiniam puslapiui pateiktas wireframe’as ir galutinio puslapio ekrano nuotrauka.
 
 ### 3.1. Čempionų sąrašas
 
-| Wireframe | Realizacija |
+| Wireframe | Rezultatas |
 | --- | --- |
 | ![Čempionų sąrašo wireframe](docs/wireframes/champions.png) | ![Čempionų sąrašas](docs/ui/champions.png) |
 
 ### 3.2. Čempiono puslapis su build’ų sąrašu
 
-| Wireframe | Realizacija |
+| Wireframe | Rezultatas |
 | --- | --- |
 | ![Čempiono puslapio wireframe](docs/wireframes/champion.png) | ![Čempiono puslapis](docs/ui/champion.png) |
 
 ### 3.3. Build’o puslapis su komentarais
 
-| Wireframe | Realizacija |
+| Wireframe | Rezultatas |
 | --- | --- |
 | ![Build’o puslapio wireframe](docs/wireframes/build.png) | ![Build’o puslapis](docs/ui/build.png) |
 
 ### 3.4. Prisijungimas ir registracija
 
-| Wireframe | Realizacija |
+| Wireframe | Rezultatas |
 | --- | --- |
 | ![Prisijungimo wireframe](docs/wireframes/login.png) | ![Prisijungimas](docs/ui/login.png) ![Registracija](docs/ui/register.png) |
 
@@ -167,7 +165,13 @@ Iki 768 px pločio šoninė juosta perkeliama po turiniu, o meniu pakeičiamas �
 
 ![Čempiono puslapis mobiliajame įrenginyje](docs/ui/champion-mobile.png)
 
-Kiti sąsajos sprendimai: kūrimo, redagavimo ir trynimo formos atidaromos modaliniuose languose; formose naudojami teksto, teksto srities, išskleidžiamojo sąrašo, žymimųjų langelių, akučių ir failo įkėlimo laukai; privalomi laukai pažymėti `*`, klaidos rodomos prie laukų; apie veiksmų rezultatus pranešama iškylančiais pranešimais (be naršyklės `alert`); naudojami Oswald ir PT Sans šriftai bei SVG ikonos (Lucide).
+Kiti sąsajos sprendimai:
+
+- Kūrimo, redagavimo ir trynimo formos atsidaro modaliniuose languose.
+- Formose yra teksto, teksto srities, išskleidžiamojo sąrašo, žymimųjų langelių, akučių ir failo įkėlimo laukai.
+- Privalomi laukai pažymėti `*`, o klaidos rodomos prie pačių laukų.
+- Apie veiksmo rezultatą pranešama iškylančiu pranešimu, o ne naršyklės `alert`.
+- Šriftai – Oswald ir PT Sans, ikonos – SVG (Lucide).
 
 ## 4. API specifikacija
 
@@ -204,7 +208,7 @@ Papildomai:
 - **Puslapiavimas** – visi sąrašų metodai priima `page` ir `pageSize` (1–50) parametrus ir grąžina `items`, `page`, `pageSize`, `totalCount`, `totalPages`.
 - **Filtravimas** – čempionai pagal pavadinimą (`?name=ah`), build’ai pagal poziciją (`?position=Mid`), komentarai pagal tekstą (`?search=zhonya`).
 - **Hypermedia** – kiekvienas objektas ir sąrašas turi `links` masyvą su susijusiais keliais ir leidžiamais veiksmais (`self`, `update`, `delete`, `builds`, `comments`, `next`, `previous` ir kt.).
-- **Suvestinė iš kelių esybių** – `GET /api/v1/champions/{championId}/summary` grąžina čempioną, jo build’ų ir komentarų skaičių, build’ų pasiskirstymą pagal pozicijas ir naujausius build’us.
+- **Suvestinė (aggregate)** – `GET /api/v1/champions/{championId}/summary` grąžina čempioną, jo build’ų ir komentarų skaičių, build’ų pasiskirstymą pagal pozicijas ir naujausius build’us.
 
 Bendri atsako kodai:
 
@@ -2102,29 +2106,29 @@ HTTP/1.1 204
 Reikia .NET 10 SDK ir Node.js.
 
 ```bash
-# API
+# Back-end
 cd backend
 dotnet run --urls http://localhost:5224
 
-# Kliento aplikacija (kitame terminale)
+# Front-end (kitame terminale)
 cd frontend
 npm install
 npm run dev
 ```
 
-Kliento aplikacija pasiekiama adresu `http://localhost:5173`. API adresas nurodomas aplinkos kintamuoju `VITE_API_URL` (numatytasis `http://localhost:5224`).
+Front-end’as pasiekiamas adresu `http://localhost:5173`. API adresas nurodomas aplinkos kintamuoju `VITE_API_URL` (numatytasis `http://localhost:5224`).
 
-- Duomenų bazės failas `lolbuilds.db` sukuriamas ir užpildomas prasmingais pradiniais duomenimis automatiškai: 8 naudotojai, 16 čempionų, 28 build’ai ir 55 komentarai. Norint atkurti pradinius duomenis, failą užtenka ištrinti.
+- Duomenų bazės failas `lolbuilds.db` sukuriamas ir automatiškai užpildomas pradiniais duomenimis: 8 naudotojai, 16 čempionų, 28 build’ai ir 55 komentarai. Norint atkurti pradinius duomenis, failą užtenka ištrinti.
 - OpenAPI specifikacija ir Swagger UI: `http://localhost:5224/swagger`.
 - Postman užklausų rinkinys su testais: `postman/LolBuilds.postman_collection.json`. Paleidimas: `postman collection run postman/LolBuilds.postman_collection.json`.
 
 ## 6. Išvados
 
-1. Sistema padalinta į tris dalis (API, React klientas, duomenų bazė), kurios bendrauja tik per REST API. Dėl to API buvo galima pilnai ištestuoti Postman dar neturint kliento, o klientą keisti nekeičiant serverio.
+1. Sistema padalinta į tris dalis (back-end, front-end ir duomenų bazė), o front-end’as su back-end’u bendrauja tik per REST API. Dėl to API buvo galima pilnai ištestuoti Postman dar neturint front-end’o, o front-end’ą keisti nekeičiant back-end’o.
 2. Build’ai ir komentarai pasiekiami tik per savo čempioną (`/champions/{id}/builds/{id}/comments/{id}`). Todėl priklausomybė tikrinama vienoje vietoje, ir per URL negalima gauti kito čempiono build’o ar komentaro – tokiu atveju grąžinamas `404`.
-3. Atskyrus `400` (neperskaitomas JSON) nuo `422` (nepraeina validacijos), klientas iš kodo supranta, ar klaida yra užklausos formate, ar konkrečiose reikšmėse. Testuojant rasta, kad labai didelis `page` sukeldavo `500`, todėl tikrinti reikia ne tik įprastas, bet ir kraštines reikšmes.
+3. Atskyrus `400` (neperskaitomas JSON) nuo `422` (nepraeina validacijos), API naudotojas (front-end’as ar Postman) iš kodo supranta, ar klaida yra užklausos formate, ar konkrečiose reikšmėse. Testuojant rasta, kad labai didelis `page` sukeldavo `500`, todėl tikrinti reikia ne tik įprastas, bet ir kraštines reikšmes.
 4. Su JWT serveriui nereikia saugoti sesijų, tačiau atsijungus prieigos žetonas dar galioja iki savo pabaigos. Dėl to prieigos žetonas padarytas trumpas (15 min.), o ilgai galiojantis atnaujinimo žetonas saugomas duomenų bazėje, kad jį būtų galima atšaukti.
 5. SQLite su `EnsureCreated` leido greitai pradėti, bet pridėjus atnaujinimo žetonų lentelę bazę teko sukurti iš naujo. Jei sistemoje yra duomenų, kurių negalima prarasti, migracijas reikia naudoti nuo pat pradžių.
 6. Postman testai leido po kiekvieno pakeitimo iš naujo patikrinti visą API ir tą patį rinkinį paleisti prieš patalpintą versiją. Testai, kurie rėmėsi konkrečiais pradinių duomenų ID, lūžo pakeitus pradinius duomenis, todėl testai turėtų patys susikurti reikalingus duomenis.
-7. Patalpinus sistemą Railway iškilo problemų, kurių lokaliai nebuvo: programa negalėjo rašyti į tomą, o pakeitus kliento adresą nustojo veikti CORS. Iš to matyti, kad nuo aplinkos priklausantys nustatymai turi būti aplinkos kintamuosiuose, o sistemą verta patalpinti kuo anksčiau.
+7. Patalpinus sistemą Railway iškilo problemų, kurių lokaliai nebuvo: programa negalėjo rašyti į tomą, o pakeitus front-end’o adresą nustojo veikti CORS. Iš to matyti, kad nuo aplinkos priklausantys nustatymai turi būti aplinkos kintamuosiuose, o sistemą verta patalpinti kuo anksčiau.
 8. Kuriant naudotas DI įrankis kodui rašyti. Kadangi sugeneruotas kodas nebūtinai veikia teisingai, jis buvo tikrinamas Postman testais ir išbandomas rankiniu būdu.
