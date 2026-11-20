@@ -22,9 +22,9 @@ Demonstraciniai naudotojai (slaptažodis `Password123!`): `admin` (Admin), `fake
 
 ### 1.1. Sistemos paskirtis
 
-„League of Legends“ žaidėjai tam pačiam čempionui gali naudoti skirtingus daiktus (items), burtus (summoner spells) ir runas (runes), priklausomai nuo žaidimo pozicijos bei pasirinktos strategijos. Norint pasidalinti tokiu pasirinkimu, reikia pateikti ne tik patį build’ą, bet ir paaiškinti, kada ir kaip jį naudoti.
+„League of Legends“ žaidėjai tam pačiam čempionui gali naudoti skirtingus item’us, summoner spell’us ir runas, priklausomai nuo žaidimo pozicijos bei pasirinktos strategijos. Norint pasidalinti tokiu pasirinkimu, reikia pateikti ne tik patį build’ą, bet ir paaiškinti, kada ir kaip jį naudoti.
 
-Projekto tikslas – sukurti internetinę platformą, kurioje naudotojai galėtų kurti čempionams skirtus build’us, dalintis jais ir aptarti juos komentaruose. Build’ą sudaro pavadinimas, aprašymas, žaidimo pozicija, pasirinkti daiktai, summoner spell'ai ir runos.
+Projekto tikslas – sukurti internetinę platformą, kurioje naudotojai galėtų kurti čempionams skirtus build’us, dalintis jais ir aptarti juos komentaruose. Build’ą sudaro pavadinimas, aprašymas, žaidimo pozicija, pasirinkti item’ai, summoner spell’ai ir runos.
 
 Čempionai iš anksto įkelti į sistemą, o jų informaciją valdo administratorius. Build’us ir komentarus kuria registruoti naudotojai. Neprisijungę lankytojai gali peržiūrėti viešai pateiktą turinį.
 
@@ -35,7 +35,7 @@ Sistemoje yra trys pagrindiniai objektai:
 | Objektas | Paskirtis ir pagrindinė informacija |
 | --- | --- |
 | **Čempionas (Champion)** | Žaidimo čempionas, kuriam kuriami build’ai. Saugomas jo pavadinimas, titulas, aprašymas ir paveikslėlio nuoroda. |
-| **Build’as (Build)** | Konkrečiam čempionui skirtas naudotojo sukurtas build’as. Saugomas pavadinimas, aprašymas, žaidimo pozicija, pasirinkti daiktai, burtai, runos, autorius ir sukūrimo bei atnaujinimo laikas. |
+| **Build’as (Build)** | Konkrečiam čempionui skirtas naudotojo sukurtas build’as. Saugomas pavadinimas, aprašymas, žaidimo pozicija, pasirinkti item’ai, summoner spell’ai, runos, autorius ir sukūrimo bei atnaujinimo laikas. |
 | **Komentaras (Comment)** | Naudotojo atsiliepimas arba klausimas po konkrečiu build’u. Saugomas tekstas, autorius ir sukūrimo bei atnaujinimo laikas. |
 
 Objektai sudaro hierarchiją **Champion → Build → Comment**:
@@ -45,7 +45,7 @@ Objektai sudaro hierarchiją **Champion → Build → Comment**:
 
 Naudotojų paskyros saugomos atskirai ir naudojamos autentifikacijai, autorizacijai bei turinio autorystei nustatyti. Jos nėra vienas iš trijų pagrindinių taikomosios srities objektų.
 
-Daiktai, burtai ir runos pasirenkami iš iš anksto parengto katalogo. Pasirinkta kombinacija saugoma kaip build’o dalis; atskiros jų CRUD valdymo funkcijos į pradinę projekto apimtį neįtraukiamos.
+Item’ai, summoner spell’ai ir runos pasirenkami iš iš anksto parengto katalogo. Pasirinkta kombinacija saugoma kaip build’o dalis; atskiros jų CRUD valdymo funkcijos į pradinę projekto apimtį neįtraukiamos.
 
 ### 1.3. Funkciniai reikalavimai
 
@@ -55,7 +55,7 @@ Neprisijungęs naudotojas gali:
 
 1. Peržiūrėti čempionų sąrašą ir konkretaus čempiono informaciją.
 2. Peržiūrėti pasirinktam čempionui sukurtus build’us.
-3. Peržiūrėti konkretaus build’o aprašymą, daiktus, burtus ir runas.
+3. Peržiūrėti konkretaus build’o aprašymą, item’us, summoner spell’us ir runas.
 4. Peržiūrėti build’o komentarus.
 5. Užsiregistruoti ir prisijungti prie sistemos.
 
@@ -63,7 +63,7 @@ Neprisijungęs naudotojas gali:
 
 Prisijungęs naudotojas gali naudotis svečiui prieinamomis turinio peržiūros funkcijomis ir papildomai:
 
-1. Sukurti pasirinktam čempionui skirtą build’ą: nurodyti jo pavadinimą, aprašymą ir žaidimo poziciją, pasirinkti daiktus, burtus bei runas.
+1. Sukurti pasirinktam čempionui skirtą build’ą: nurodyti jo pavadinimą, aprašymą ir žaidimo poziciją, pasirinkti item’us, summoner spell’us bei runas.
 2. Redaguoti ir pašalinti savo sukurtus build’us.
 3. Rašyti komentarus po build’ais.
 4. Redaguoti ir pašalinti savo komentarus.
