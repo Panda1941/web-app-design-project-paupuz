@@ -153,18 +153,81 @@ export function ChampionImage(props: { src: string; alt: string; className?: str
   )
 }
 
-export function FieldError({ errors }: { errors?: string[] }) {
-  if (!errors || errors.length === 0) return null
-  return <div className="field-error">{errors[0]}</div>
+// ---------- Form helpers used together with useValidation ----------
+
+// Label with a red * for required fields and an optional hint on the right.
+export function FieldLabel(props: { field: string; required?: boolean; hint?: ReactNode; children: ReactNode }) {
+  return (
+    <label htmlFor={`field-${props.field}`} className="field-label">
+      <span>
+        {props.children}
+        {props.required && (
+          <span className="required-mark" title="Required">
+            {' '}
+            *
+          </span>
+        )}
+      </span>
+      {props.hint && <span className="field-hint">{props.hint}</span>}
+    </label>
+  )
+}
+
+// "12 / 80" counter that turns red when the text is too short or too long.
+export function CharCount(props: { value: string; min: number; max: number }) {
+  const length = props.value.trim().length
+  const bad = length > 0 && (length < props.min || length > props.max)
+  return (
+    <span className={bad ? 'char-count char-count-bad' : 'char-count'}>
+      {length} / {props.max}
+    </span>
+  )
+}
+
+export function FieldMessage({ message }: { message?: string }) {
+  if (!message) return null
+  return (
+    <div className="field-error" role="alert">
+      <TriangleAlert size={12} /> {message}
+    </div>
+  )
+}
+
+// Box at the top of a form listing everything that still needs fixing.
+export function FormSummary(props: { messages: string[]; serverMessage?: string }) {
+  if (props.messages.length > 0) {
+    return (
+      <div className="form-error form-summary">
+        <TriangleAlert size={18} />
+        <div>
+          <strong>Please fix the following:</strong>
+          <ul>
+            {props.messages.map((message) => (
+              <li key={message}>{message}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    )
+  }
+  if (props.serverMessage) {
+    return (
+      <div className="form-error">
+        <TriangleAlert size={18} /> {props.serverMessage}
+      </div>
+    )
+  }
+  return null
+}
+
+export function RequiredNote() {
+  return (
+    <p className="required-note">
+      Fields marked with <span className="required-mark">*</span> are required.
+    </p>
+  )
 }
 
 export function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
-}
-
-// Converts server validation keys like "Title" or "summonerSpells" to lowercase so forms can look them up.
-export function normalizeErrors(errors: Record<string, string[]>): Record<string, string[]> {
-  const result: Record<string, string[]> = {}
-  for (const [key, value] of Object.entries(errors)) result[key.toLowerCase()] = value
-  return result
 }

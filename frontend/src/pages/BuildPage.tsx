@@ -1,15 +1,19 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ChevronRight, MessageSquare, Pencil, Send, Trash2 } from 'lucide-react'
-import { ApiError, api, type Build, type Comment, type Paged } from '../api'
+import { api, type Build, type Comment, type Paged } from '../api'
 import { useAuth } from '../auth'
 import { useToast } from '../toast'
 import { itemImage, itemName, positionImage, runeImage, spellImage, spellName } from '../data/gameData'
 import { BuildForm } from '../components/BuildForm'
+import { checkText, useValidation } from '../validation'
 import {
+  CharCount,
   ConfirmModal,
   ErrorBox,
-  FieldError,
+  FieldLabel,
+  FieldMessage,
+  FormSummary,
   Modal,
   Pagination,
   Panel,
@@ -180,8 +184,8 @@ function Comments({ championId, buildId }: { championId: number; buildId: number
   const [page, setPage] = useState(1)
   const [reload, setReload] = useState(0)
   const [text, setText] = useState('')
-  const [textError, setTextError] = useState<string[]>()
   const [posting, setPosting] = useState(false)
+  const v = useValidation({ text: checkText(text, 'Comment', 2, 1000) })
   const [editing, setEditing] = useState<Comment | null>(null)
   const [deleting, setDeleting] = useState<Comment | null>(null)
 
@@ -194,18 +198,19 @@ function Comments({ championId, buildId }: { championId: number; buildId: number
 
   async function post(e: FormEvent) {
     e.preventDefault()
-    setTextError(undefined)
+    if (!v.trySubmit()) return
     setPosting(true)
     try {
       await api.createComment(championId, buildId, text)
       setText('')
+      v.reset()
       toast.success('Comment posted.')
       // Jump to the last page so the new comment is visible.
       const last = Math.max(1, Math.ceil(((data?.totalCount ?? 0) + 1) / (data?.pageSize ?? 10)))
       setPage(last)
       setReload(reload + 1)
     } catch (err) {
-      if (err instanceof ApiError) setTextError(err.fieldErrors.Text ?? [err.message])
+      v.handleApiError(err)
     } finally {
       setPosting(false)
     }
@@ -249,19 +254,22 @@ function Comments({ championId, buildId }: { championId: number; buildId: number
       {data && <Pagination page={data.page} totalPages={data.totalPages} onChange={setPage} />}
 
       {user ? (
-        <form className="comment-form" onSubmit={post}>
-          <label htmlFor="new-comment">Leave a comment</label>
+        <form className="comment-form" onSubmit={post} noValidate>
+          <FieldLabel field="text" required hint={<CharCount value={text} min={2} max={1000} />}>
+            Leave a comment
+          </FieldLabel>
+          {v.serverMessage && <FormSummary messages={[]} serverMessage={v.serverMessage} />}
           <textarea
-            id="new-comment"
+            id="field-text"
+            className={v.invalid('text')}
             value={text}
             onChange={(e) => setText(e.target.value)}
+            onBlur={() => text && v.touch('text')}
             rows={3}
-            required
-            minLength={2}
             maxLength={1000}
             placeholder="What do you think about this build?"
           />
-          <FieldError errors={textError} />
+          <FieldMessage message={v.errorFor('text')} />
           <button type="submit" className="btn btn-primary" disabled={posting}>
             <Send size={14} /> {posting ? 'Posting…' : 'Post comment'}
           </button>
@@ -314,16 +322,17 @@ function EditCommentModal(props: {
   onClose: () => void
 }) {
   const [text, setText] = useState(props.comment.text)
-  const [error, setError] = useState<string[]>()
   const [saving, setSaving] = useState(false)
+  const v = useValidation({ text: checkText(text, 'Comment', 2, 1000) })
 
   async function submit(e: FormEvent) {
     e.preventDefault()
+    if (!v.trySubmit()) return
     setSaving(true)
     try {
       await props.onSave(text)
     } catch (err) {
-      if (err instanceof ApiError) setError(err.fieldErrors.Text ?? [err.message])
+      v.handleApiError(err)
     } finally {
       setSaving(false)
     }
@@ -331,19 +340,22 @@ function EditCommentModal(props: {
 
   return (
     <Modal title="Edit comment" onClose={props.onClose}>
-      <form className="form" onSubmit={submit}>
+      <form className="form" onSubmit={submit} noValidate>
+        <FormSummary messages={v.summary} serverMessage={v.serverMessage} />
         <div className="form-row">
-          <label htmlFor="edit-comment">Comment</label>
+          <FieldLabel field="text" required hint={<CharCount value={text} min={2} max={1000} />}>
+            Comment
+          </FieldLabel>
           <textarea
-            id="edit-comment"
+            id="field-text"
+            className={v.invalid('text')}
             value={text}
             onChange={(e) => setText(e.target.value)}
+            onBlur={() => v.touch('text')}
             rows={4}
-            required
-            minLength={2}
             maxLength={1000}
           />
-          <FieldError errors={error} />
+          <FieldMessage message={v.errorFor('text')} />
         </div>
         <div className="form-actions">
           <button type="button" className="btn" onClick={props.onClose}>

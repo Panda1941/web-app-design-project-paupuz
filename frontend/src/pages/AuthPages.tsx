@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { LogIn, UserPlus } from 'lucide-react'
-import { ApiError } from '../api'
 import { useAuth } from '../auth'
 import { useToast } from '../toast'
-import { FieldError, Panel, normalizeErrors } from '../components/common'
+import { checkEmail, checkText, useValidation } from '../validation'
+import { CharCount, FieldLabel, FieldMessage, FormSummary, Panel, RequiredNote } from '../components/common'
 
 export function LoginPage() {
   const { login } = useAuth()
@@ -12,19 +12,23 @@ export function LoginPage() {
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+
+  const v = useValidation({
+    username: username.trim() ? undefined : 'Username is required.',
+    password: password ? undefined : 'Password is required.',
+  })
 
   async function submit(e: FormEvent) {
     e.preventDefault()
-    setError('')
+    if (!v.trySubmit()) return
     setBusy(true)
     try {
       await login(username, password)
       toast.success(`Welcome back, ${username}!`)
       navigate('/')
     } catch (err) {
-      setError((err as Error).message)
+      v.handleApiError(err)
     } finally {
       setBusy(false)
     }
@@ -33,28 +37,37 @@ export function LoginPage() {
   return (
     <div className="auth-page">
       <Panel title="Log in" icon={<LogIn size={18} />}>
-        <form className="form" onSubmit={submit}>
-          {error && <div className="form-error">{error}</div>}
+        <form className="form" onSubmit={submit} noValidate>
+          <RequiredNote />
+          <FormSummary messages={v.summary} serverMessage={v.serverMessage} />
           <div className="form-row">
-            <label htmlFor="login-username">Username</label>
+            <FieldLabel field="username" required>
+              Username
+            </FieldLabel>
             <input
-              id="login-username"
+              id="field-username"
+              className={v.invalid('username')}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              onBlur={() => v.touch('username')}
               autoComplete="username"
-              required
             />
+            <FieldMessage message={v.errorFor('username')} />
           </div>
           <div className="form-row">
-            <label htmlFor="login-password">Password</label>
+            <FieldLabel field="password" required>
+              Password
+            </FieldLabel>
             <input
-              id="login-password"
+              id="field-password"
               type="password"
+              className={v.invalid('password')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onBlur={() => v.touch('password')}
               autoComplete="current-password"
-              required
             />
+            <FieldMessage message={v.errorFor('password')} />
           </div>
           <button type="submit" className="btn btn-primary btn-block" disabled={busy}>
             {busy ? 'Logging in…' : 'Log in'}
@@ -79,28 +92,28 @@ export function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
-  const [errors, setErrors] = useState<Record<string, string[]>>({})
-  const [formError, setFormError] = useState('')
   const [busy, setBusy] = useState(false)
+
+  // Same rules as RegisterRequest on the backend, plus "passwords match".
+  const v = useValidation({
+    username:
+      checkText(username, 'Username', 3, 30) ??
+      (/^[A-Za-z0-9_]+$/.test(username.trim()) ? undefined : 'Username can only contain letters, numbers and _.'),
+    email: checkEmail(email),
+    password: checkText(password, 'Password', 8, 100),
+    confirm: !confirm ? 'Repeat your password.' : confirm !== password ? 'Passwords do not match.' : undefined,
+  })
 
   async function submit(e: FormEvent) {
     e.preventDefault()
-    setErrors({})
-    setFormError('')
-    if (password !== confirm) {
-      setErrors({ confirm: ['Passwords do not match.'] })
-      return
-    }
+    if (!v.trySubmit()) return
     setBusy(true)
     try {
       await register(username, email, password)
       toast.success('Account created. Welcome!')
       navigate('/')
     } catch (err) {
-      if (err instanceof ApiError) {
-        setErrors(normalizeErrors(err.fieldErrors))
-        setFormError(err.message)
-      }
+      v.handleApiError(err)
     } finally {
       setBusy(false)
     }
@@ -109,60 +122,71 @@ export function RegisterPage() {
   return (
     <div className="auth-page">
       <Panel title="Create an account" icon={<UserPlus size={18} />}>
-        <form className="form" onSubmit={submit}>
-          {formError && <div className="form-error">{formError}</div>}
+        <form className="form" onSubmit={submit} noValidate>
+          <RequiredNote />
+          <FormSummary messages={v.summary} serverMessage={v.serverMessage} />
           <div className="form-row">
-            <label htmlFor="reg-username">Username</label>
+            <FieldLabel field="username" required hint={<CharCount value={username} min={3} max={30} />}>
+              Username
+            </FieldLabel>
             <input
-              id="reg-username"
+              id="field-username"
+              className={v.invalid('username')}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              onBlur={() => v.touch('username')}
               autoComplete="username"
-              required
-              minLength={3}
               maxLength={30}
-              pattern="[A-Za-z0-9_]+"
-              title="Letters, numbers and _ only"
+              placeholder="letters, numbers and _"
             />
-            <FieldError errors={errors.username} />
+            <FieldMessage message={v.errorFor('username')} />
           </div>
           <div className="form-row">
-            <label htmlFor="reg-email">Email</label>
+            <FieldLabel field="email" required>
+              Email
+            </FieldLabel>
             <input
-              id="reg-email"
+              id="field-email"
               type="email"
+              className={v.invalid('email')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              onBlur={() => v.touch('email')}
               autoComplete="email"
-              required
+              placeholder="name@example.com"
             />
-            <FieldError errors={errors.email} />
+            <FieldMessage message={v.errorFor('email')} />
           </div>
           <div className="form-row-split">
             <div className="form-row">
-              <label htmlFor="reg-password">Password</label>
+              <FieldLabel field="password" required hint="min. 8 characters">
+                Password
+              </FieldLabel>
               <input
-                id="reg-password"
+                id="field-password"
                 type="password"
+                className={v.invalid('password')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onBlur={() => v.touch('password')}
                 autoComplete="new-password"
-                required
-                minLength={8}
               />
-              <FieldError errors={errors.password} />
+              <FieldMessage message={v.errorFor('password')} />
             </div>
             <div className="form-row">
-              <label htmlFor="reg-confirm">Repeat password</label>
+              <FieldLabel field="confirm" required>
+                Repeat password
+              </FieldLabel>
               <input
-                id="reg-confirm"
+                id="field-confirm"
                 type="password"
+                className={v.invalid('confirm')}
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
+                onBlur={() => v.touch('confirm')}
                 autoComplete="new-password"
-                required
               />
-              <FieldError errors={errors.confirm} />
+              <FieldMessage message={v.errorFor('confirm')} />
             </div>
           </div>
           <button type="submit" className="btn btn-primary btn-block" disabled={busy}>

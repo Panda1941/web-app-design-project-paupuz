@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { ApiError, type Build, type BuildInput } from '../api'
+import { type Build, type BuildInput } from '../api'
 import {
   ITEMS,
   POSITIONS,
@@ -11,7 +11,8 @@ import {
   runeImage,
   spellImage,
 } from '../data/gameData'
-import { FieldError, Modal, normalizeErrors } from './common'
+import { checkText, useValidation } from '../validation'
+import { CharCount, FieldLabel, FieldMessage, FormSummary, Modal, RequiredNote } from './common'
 
 const MAX_ITEMS = 6
 
@@ -34,9 +35,16 @@ export function BuildForm(props: {
   const [items, setItems] = useState<number[]>(b?.items ?? [])
   const [itemSearch, setItemSearch] = useState('')
 
-  const [errors, setErrors] = useState<Record<string, string[]>>({})
-  const [formError, setFormError] = useState('')
   const [saving, setSaving] = useState(false)
+
+  // Same rules as BuildRequest on the backend.
+  const v = useValidation({
+    title: checkText(title, 'Build title', 3, 80),
+    summonerSpells:
+      spells.length === 2 ? undefined : `Pick ${2 - spells.length} more summoner spell${spells.length === 1 ? '' : 's'}.`,
+    items: items.length === 0 ? 'Pick at least 1 item (up to 6).' : undefined,
+    description: checkText(description, 'Guide', 10, 4000),
+  })
 
   function toggleSpell(key: string) {
     if (spells.includes(key)) setSpells(spells.filter((s) => s !== key))
@@ -56,19 +64,8 @@ export function BuildForm(props: {
 
   async function submit(e: FormEvent) {
     e.preventDefault()
-    setErrors({})
-    setFormError('')
-
-    // Quick checks in the browser; the server validates everything again.
-    if (spells.length !== 2) {
-      setErrors({ summonerspells: ['Pick exactly 2 summoner spells.'] })
-      return
-    }
-    if (items.length === 0) {
-      setErrors({ items: ['Pick at least 1 item.'] })
-      return
-    }
-
+    // Checked in the browser first; the server validates everything again.
+    if (!v.trySubmit()) return
     setSaving(true)
     try {
       await props.onSave({
@@ -82,10 +79,7 @@ export function BuildForm(props: {
         secondaryRuneTree: secondaryTree,
       })
     } catch (err) {
-      if (err instanceof ApiError) {
-        setErrors(normalizeErrors(err.fieldErrors))
-        setFormError(err.message)
-      }
+      v.handleApiError(err)
     } finally {
       setSaving(false)
     }
@@ -95,39 +89,49 @@ export function BuildForm(props: {
 
   return (
     <Modal title={b ? `Edit build: ${b.title}` : `New ${props.championName} build`} onClose={props.onClose} wide>
-      <form onSubmit={submit} className="form">
-        {formError && <div className="form-error">{formError}</div>}
+      <form onSubmit={submit} className="form" noValidate>
+        <RequiredNote />
+        <FormSummary messages={v.summary} serverMessage={v.serverMessage} />
 
         <div className="form-row-split">
           <div className="form-row">
-            <label htmlFor="build-title">Build title</label>
+            <FieldLabel field="title" required hint={<CharCount value={title} min={3} max={80} />}>
+              Build title
+            </FieldLabel>
             <input
-              id="build-title"
+              id="field-title"
+              className={v.invalid('title')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              required
-              minLength={3}
+              onBlur={() => v.touch('title')}
               maxLength={80}
               placeholder="e.g. Electrocute burst mid"
             />
-            <FieldError errors={errors.title} />
+            <FieldMessage message={v.errorFor('title')} />
           </div>
           <div className="form-row">
-            <label htmlFor="build-position">Position</label>
-            <select id="build-position" value={position} onChange={(e) => setPosition(e.target.value)}>
+            <FieldLabel field="position" required>
+              Position
+            </FieldLabel>
+            <select id="field-position" value={position} onChange={(e) => setPosition(e.target.value)}>
               {POSITIONS.map((p) => (
                 <option key={p} value={p}>
                   {p}
                 </option>
               ))}
             </select>
-            <FieldError errors={errors.position} />
+            <FieldMessage message={v.errorFor('position')} />
           </div>
         </div>
 
         <fieldset className="form-row">
-          <legend>Summoner spells (pick 2)</legend>
-          <div className="choice-grid">
+          <legend className="field-label">
+            <span>
+              Summoner spells <span className="required-mark">*</span>
+            </span>
+            <span className="field-hint">{spells.length} / 2 picked</span>
+          </legend>
+          <div className={`choice-grid ${v.invalid('summonerSpells')}`}>
             {SUMMONER_SPELLS.map((spell) => (
               <label key={spell.key} className={`choice ${spells.includes(spell.key) ? 'choice-on' : ''}`}>
                 <input
@@ -140,12 +144,16 @@ export function BuildForm(props: {
               </label>
             ))}
           </div>
-          <FieldError errors={errors.summonerspells} />
+          <FieldMessage message={v.errorFor('summonerSpells')} />
         </fieldset>
 
         <div className="form-row-split">
           <fieldset className="form-row">
-            <legend>Primary rune tree</legend>
+            <legend className="field-label">
+            <span>
+              Primary rune tree <span className="required-mark">*</span>
+            </span>
+          </legend>
             <div className="radio-list">
               {RUNE_TREES.map((tree) => (
                 <label key={tree.name} className={`radio ${primaryTree === tree.name ? 'radio-on' : ''}`}>
@@ -161,21 +169,25 @@ export function BuildForm(props: {
                 </label>
               ))}
             </div>
-            <label htmlFor="build-keystone" className="sub-label">
-              Keystone
+            <label htmlFor="field-keystone" className="sub-label">
+              Keystone <span className="required-mark">*</span>
             </label>
-            <select id="build-keystone" value={keystone} onChange={(e) => setKeystone(e.target.value)}>
+            <select id="field-keystone" value={keystone} onChange={(e) => setKeystone(e.target.value)}>
               {keystonesOf(primaryTree).map((k) => (
                 <option key={k} value={k}>
                   {k}
                 </option>
               ))}
             </select>
-            <FieldError errors={errors.keystone ?? errors.primaryrunetree} />
+            <FieldMessage message={v.errorFor('keystone') ?? v.errorFor('primaryRuneTree')} />
           </fieldset>
 
           <fieldset className="form-row">
-            <legend>Secondary rune tree</legend>
+            <legend className="field-label">
+            <span>
+              Secondary rune tree <span className="required-mark">*</span>
+            </span>
+          </legend>
             <div className="radio-list">
               {RUNE_TREES.filter((tree) => tree.name !== primaryTree).map((tree) => (
                 <label key={tree.name} className={`radio ${secondaryTree === tree.name ? 'radio-on' : ''}`}>
@@ -191,15 +203,20 @@ export function BuildForm(props: {
                 </label>
               ))}
             </div>
-            <FieldError errors={errors.secondaryrunetree} />
+            <FieldMessage message={v.errorFor('secondaryRuneTree')} />
           </fieldset>
         </div>
 
         <fieldset className="form-row">
-          <legend>
-            Items ({items.length}/{MAX_ITEMS}) – click in the order you buy them
+          <legend className="field-label">
+            <span>
+              Items <span className="required-mark">*</span>
+            </span>
+            <span className="field-hint">
+              {items.length} / {MAX_ITEMS} · click in the order you buy them
+            </span>
           </legend>
-          <div className="selected-items">
+          <div className={`selected-items ${v.invalid('items')}`}>
             {items.length === 0 && <span className="muted">No items selected yet.</span>}
             {items.map((id, index) => (
               <button
@@ -233,22 +250,24 @@ export function BuildForm(props: {
               </label>
             ))}
           </div>
-          <FieldError errors={errors.items} />
+          <FieldMessage message={v.errorFor('items')} />
         </fieldset>
 
         <div className="form-row">
-          <label htmlFor="build-desc">Guide / description</label>
+          <FieldLabel field="description" required hint={<CharCount value={description} min={10} max={4000} />}>
+            Guide / description
+          </FieldLabel>
           <textarea
-            id="build-desc"
+            id="field-description"
+            className={v.invalid('description')}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            required
-            minLength={10}
+            onBlur={() => v.touch('description')}
             maxLength={4000}
             rows={5}
             placeholder="When should people use this build? What's the game plan?"
           />
-          <FieldError errors={errors.description} />
+          <FieldMessage message={v.errorFor('description')} />
         </div>
 
         <div className="form-actions">

@@ -944,6 +944,82 @@ textarea {
   color: #ff8a80;
 }
 
+/* Validation: required marks, hints, counters and invalid fields */
+.field-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+}
+
+.required-mark {
+  color: #ff6b5e;
+  font-weight: 700;
+}
+
+.field-hint {
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.char-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.char-count-bad {
+  color: #ff8a80;
+  font-weight: 700;
+}
+
+.required-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+input.input-invalid,
+textarea.input-invalid,
+select.input-invalid,
+.choice-grid.input-invalid,
+.selected-items.input-invalid {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 1px #6e2a25;
+  animation: shake 0.3s;
+}
+
+.choice-grid.input-invalid {
+  border: 1px solid var(--danger);
+  padding: 4px;
+}
+
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  animation: fade-in 0.2s;
+}
+
+.form-summary {
+  align-items: flex-start;
+}
+
+.form-summary ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  font-size: 13px;
+}
+
+@keyframes shake {
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
+
 /* Clickable choice tiles: summoner spells (checkboxes) */
 .choice-grid {
   display: grid;
