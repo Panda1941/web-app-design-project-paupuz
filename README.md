@@ -145,7 +145,18 @@ Sistemą sudaro trys dalys:
 
 Kliento aplikacija ir REST API talpinamos debesijos platformoje Railway ir pasiekiamos internetu. Naršyklė gauna kliento aplikacijos failus iš frontend paslaugos, o aplikacija kreipiasi į REST API per HTTPS. Prie duomenų bazės jungiasi tik serverio aplikacija; naršyklė tiesioginės prieigos prie jos neturi.
 
-**Diegimo diagrama bus pridėta vėliau.** Ji bus parengta pagal UML standartą, pasirinkus debesijos tiekėją ir konkretų sistemos dalių talpinimo būdą. Diagramoje bus parodytas naudotojo įrenginys su naršykle, frontend talpinimo aplinka, API vykdymo aplinka, duomenų bazė ir jų ryšiai.
+Sistema patalpinta Railway platformoje (projektas `lol-builds`), kur abi dalys diegiamos automatiškai iš `main` šakos:
+
+| Dalis | Adresas | Vykdymo aplinka |
+| --- | --- | --- |
+| Kliento aplikacija | https://web-production-45bfe930.up.railway.app | Railway paslauga `web`: sukompiliuoti React failai, aptarnaujami Caddy serverio |
+| REST API | https://api-production-3b89593d.up.railway.app | Railway paslauga `api`: ASP.NET Core (.NET 10, Kestrel) |
+| API dokumentacija | https://api-production-3b89593d.up.railway.app/swagger | Swagger UI |
+| Duomenų bazė | – | SQLite failas `/data/lolbuilds.db` Railway tome (volume), prijungtame prie `api` paslaugos |
+
+Produkcinėje aplinkoje konfigūracija perduodama aplinkos kintamaisiais: `Jwt__Key` (žetonų pasirašymo raktas), `ConnectionStrings__Default` (duomenų bazės kelias), `Cors__AllowedOrigins` (leidžiamas kliento aplikacijos adresas) ir `VITE_API_URL` (API adresas kliento aplikacijai).
+
+UML diegimo diagrama pateikiama ataskaitoje.
 
 ## 5. Paleidimas
 
