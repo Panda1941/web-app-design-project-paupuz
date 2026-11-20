@@ -1,6 +1,7 @@
 using LolBuilds.Api.Data;
 using LolBuilds.Api.Dtos;
 using LolBuilds.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -73,8 +74,10 @@ public class BuildsController : ApiControllerBase
         return Ok(Mapping.ToDto(build));
     }
 
-    /// <summary>Create a build for a champion.</summary>
+    /// <summary>Create a build for a champion. Logged-in users only; the author is taken from the token.</summary>
+    [Authorize]
     [HttpPost]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(BuildDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -103,8 +106,11 @@ public class BuildsController : ApiControllerBase
         return CreatedAtAction(nameof(GetOne), new { championId, buildId = build.Id }, Mapping.ToDto(created));
     }
 
-    /// <summary>Update a build.</summary>
+    /// <summary>Update a build. Only its author can do this.</summary>
+    [Authorize]
     [HttpPut("{buildId:int}")]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(BuildDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -114,6 +120,8 @@ public class BuildsController : ApiControllerBase
         Build? build = await FindBuild(championId, buildId);
         if (build == null)
             return NotFoundProblem($"Build {buildId} was not found for champion {championId}.");
+        if (!IsOwner(build.AuthorId))
+            return ForbiddenProblem("You can only edit your own builds.");
 
         ObjectResult? error = ValidateBuild(request);
         if (error != null)
@@ -126,8 +134,11 @@ public class BuildsController : ApiControllerBase
         return Ok(Mapping.ToDto(build));
     }
 
-    /// <summary>Delete a build, together with its comments.</summary>
+    /// <summary>Delete a build, together with its comments. Its author or an admin can do this.</summary>
+    [Authorize]
     [HttpDelete("{buildId:int}")]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int championId, int buildId)
@@ -135,6 +146,8 @@ public class BuildsController : ApiControllerBase
         Build? build = await FindBuild(championId, buildId);
         if (build == null)
             return NotFoundProblem($"Build {buildId} was not found for champion {championId}.");
+        if (!IsOwner(build.AuthorId) && !IsAdmin)
+            return ForbiddenProblem("You can only delete your own builds.");
 
         _db.Builds.Remove(build);
         await _db.SaveChangesAsync();

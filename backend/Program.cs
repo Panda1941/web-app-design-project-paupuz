@@ -1,13 +1,45 @@
 using System.Reflection;
+using System.Text;
 using LolBuilds.Api.Data;
+using LolBuilds.Api.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ---------- Database (SQLite file) ----------
 string connectionString = builder.Configuration.GetConnectionString("Default") ?? "Data Source=lolbuilds.db";
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
+
+// ---------- Authentication (JWT) ----------
+// Every request with "Authorization: Bearer <token>" gets its token checked here:
+// signature (was it made with our secret key?), issuer, audience and expiry. If all is fine,
+// the claims inside the token become HttpContext.User (used by [Authorize] and CurrentUserId).
+string jwtKey = TokenService.GetSigningKey(builder.Configuration); // fails at startup if the key is missing
+builder.Services.AddSingleton<TokenService>();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.MapInboundClaims = false; // keep claim names as they are in the token ("sub", "role")
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.FromSeconds(30),
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha256 },
+            NameClaimType = "unique_name",
+            RoleClaimType = "role", // makes [Authorize(Roles = "Admin")] read the "role" claim
+        };
+    });
+builder.Services.AddAuthorization();
 
 // ---------- Controllers + validation responses ----------
 builder.Services.AddControllers()
@@ -46,6 +78,19 @@ builder.Services.AddSwaggerGen(options =>
 {
     string xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile));
+
+    // Adds the "Authorize" button to Swagger UI so you can paste an access token.
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "Paste the accessToken from POST /api/auth/login.",
+    });
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+    {
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = new List<string>(),
+    });
 });
 
 // ---------- CORS (the React frontend runs on a different origin) ----------
@@ -72,6 +117,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseCors();
+app.UseAuthentication(); // reads and checks the token
+app.UseAuthorization();  // applies [Authorize] rules
 app.MapControllers();
 
 app.Run();

@@ -112,7 +112,24 @@ Frontend ir backend technologijos pasirinktos atsižvelgiant į patirtį su kita
 | Duomenų bazė | **SQLite** | Reliacinė duomenų bazė, laikoma viename faile ir nereikalaujanti atskiro serverio. Užtenka šios sistemos apkrovai, palaiko išorinius raktus ir kaskadinį trynimą. Esant daug lygiagrečių rašymų, tinkamesnė būtų PostgreSQL. |
 | Prieiga prie duomenų bazės | **Entity Framework Core** | Duomenų modelis aprašomas C# klasėmis. Paleidus programą, duomenų bazė sukuriama ir užpildoma pradiniais duomenimis automatiškai. |
 
-Autentifikacijai numatoma naudoti JWT. Prieigos žetonai galios trumpai, o ilgesniam prisijungimo palaikymui bus naudojami atnaujinimo žetonai. Atnaujinant prieigą, atnaujinimo žetonas bus pakeičiamas nauju, o panaudotas žetonas taps nebegaliojantis. Atsijungus, sesijos žetonai turės būti panaikinami arba pažymimi nebegaliojančiais.
+### 3.1. Autentifikacija ir autorizacija
+
+Naudojami JWT prieigos žetonai ir atnaujinimo (refresh) žetonai.
+
+| Metodas | Kelias | Paskirtis |
+| --- | --- | --- |
+| POST | `/api/auth/register` | Registracija (rolė `User`). Grąžina žetonų porą. |
+| POST | `/api/auth/login` | Prisijungimas. Grąžina žetonų porą. |
+| POST | `/api/auth/refresh` | Atnaujinimo žetono keitimas nauja žetonų pora. |
+| POST | `/api/auth/logout` | Atsijungimas: panaikinami visi naudotojo atnaujinimo žetonai. |
+| GET | `/api/auth/me` | Prisijungusio naudotojo duomenys. |
+
+- **Prieigos žetonas** – JWT, galioja 15 min., siunčiamas antraštėje `Authorization: Bearer <žetonas>`. Jame saugomi naudotojo ID (`sub`), vardas (`unique_name`), rolė (`role`), unikalus ID (`jti`), galiojimo laikas (`exp`), išdavėjas (`iss`) ir auditorija (`aud`). Pasirašomas HMAC-SHA256 algoritmu slaptu raktu `Jwt:Key`, kuris produkcinėje aplinkoje nustatomas aplinkos kintamuoju `Jwt__Key`.
+- **Atnaujinimo žetonas** – atsitiktinė 64 baitų eilutė, galioja 7 d. Duomenų bazėje saugoma tik jo SHA-256 maiša. Kiekvieną kartą atnaujinant senas žetonas panaikinamas ir išduodamas naujas (rotacija). Jei panaudotas žetonas pateikiamas dar kartą, panaikinami visi to naudotojo žetonai.
+- **Rolės** – svečias (be žetono), `User` ir `Admin`. Čempionus kurti, redaguoti ir šalinti gali tik `Admin`. Build’us ir komentarus kuria prisijungę naudotojai; redaguoti gali tik autorius, šalinti – autorius arba administratorius. Autorystė tikrinama serverio pusėje pagal žetone esantį naudotojo ID.
+- **Atsako kodai** – `401`, kai žetono nėra, jis netinkamas ar pasibaigęs; `403`, kai naudotojas prisijungęs, bet neturi teisių.
+
+Demonstraciniai naudotojai (slaptažodis `Password123!`): `admin` (Admin), `faker_fan`, `jungle_diff`, `support_main` (User).
 
 Autorizacija bus tikrinama serverio pusėje pagal naudotojo rolę ir turinio autorystę. Grafinė sąsaja leis atlikti naudotojo teisėms priklausančias CRUD operacijas ir prisitaikys prie skirtingų ekrano dydžių.
 

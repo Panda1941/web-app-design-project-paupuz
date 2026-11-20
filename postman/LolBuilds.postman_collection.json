@@ -45,9 +45,170 @@
       "key": "commentId",
       "value": "",
       "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userRefreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userRefreshToken2",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userCommentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "permChampionName",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "registerUsername",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "registerEmail",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "badEmailUsername",
+      "value": "",
+      "type": "string"
     }
   ],
   "item": [
+    {
+      "name": "0 Auth (login)",
+      "item": [
+        {
+          "name": "0.1 Login as admin -> 200 (sets accessToken and adminToken)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });",
+                  "pm.test('accessToken is a JWT-shaped string (two dots)', function () { pm.expect(j.accessToken).to.be.a('string'); pm.expect(j.accessToken.split('.').length - 1).to.eql(2); });",
+                  "pm.test('User is admin with role Admin', function () { pm.expect(j.user.role).to.eql('Admin'); });",
+                  "if (j && j.accessToken) { pm.collectionVariables.set('accessToken', j.accessToken); pm.collectionVariables.set('adminToken', j.accessToken); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "0.2 Login as faker_fan -> 200 (sets userToken and userRefreshToken)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });",
+                  "pm.test('User has role User', function () { pm.expect(j.user.role).to.eql('User'); });",
+                  "if (j && j.accessToken) { pm.collectionVariables.set('userToken', j.accessToken); pm.collectionVariables.set('userRefreshToken', j.refreshToken); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"faker_fan\",\n  \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
     {
       "name": "1 Champions",
       "item": [
@@ -429,62 +590,7 @@
           "response": []
         },
         {
-          "name": "2.2 List builds of champion 1 filtered by position=Mid",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
-                  "pm.test(\"Status is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "pm.test(\"Content-Type contains application/json\", function () {",
-                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
-                  "});",
-                  "pm.test(\"Every item has position Mid\", function () {",
-                  "    pm.expect(j.items).to.be.an('array');",
-                  "    pm.expect(j.items.length).to.be.above(0);",
-                  "    j.items.forEach(function (b) {",
-                  "        pm.expect(b.position).to.eql('Mid');",
-                  "    });",
-                  "});"
-                ]
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/api/champions/1/builds?position=Mid",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "champions",
-                "1",
-                "builds"
-              ],
-              "query": [
-                {
-                  "key": "position",
-                  "value": "Mid"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "2.3 Create build for test champion",
+          "name": "2.2 Create build for test champion",
           "event": [
             {
               "listen": "test",
@@ -541,6 +647,61 @@
                   "language": "json"
                 }
               }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.3 List builds of test champion filtered by position=Mid",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test(\"Status is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Content-Type contains application/json\", function () {",
+                  "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+                  "});",
+                  "pm.test(\"Every item has position Mid\", function () {",
+                  "    pm.expect(j.items).to.be.an('array');",
+                  "    pm.expect(j.items.length).to.be.above(0);",
+                  "    j.items.forEach(function (b) {",
+                  "        pm.expect(b.position).to.eql('Mid');",
+                  "    });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}/builds?position=Mid",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}",
+                "builds"
+              ],
+              "query": [
+                {
+                  "key": "position",
+                  "value": "Mid"
+                }
+              ]
             }
           },
           "response": []
@@ -656,7 +817,7 @@
       "name": "3 Comments",
       "item": [
         {
-          "name": "3.1 List comments of champion 1 build 1",
+          "name": "3.1 List comments of test champion build",
           "event": [
             {
               "listen": "test",
@@ -686,16 +847,16 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/api/champions/1/builds/1/comments",
+              "raw": "{{baseUrl}}/api/champions/{{championId}}/builds/{{buildId}}/comments",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "champions",
-                "1",
+                "{{championId}}",
                 "builds",
-                "1",
+                "{{buildId}}",
                 "comments"
               ]
             }
@@ -1281,10 +1442,1108 @@
       ]
     },
     {
-      "name": "5 Cleanup (deletes)",
+      "name": "5 Auth & permissions",
       "item": [
         {
-          "name": "5.1 Delete comment",
+          "name": "5.1 GET champions as guest (noauth) -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });",
+                  "pm.test('Body has items array', function () { pm.expect(j.items).to.be.an('array'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.2 POST champion without token -> 401",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('permChampionName', 'Perm ' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 401', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{permChampionName}}\",\n  \"title\": \"Permission test\",\n  \"description\": \"Permission test champion\",\n  \"imageUrl\": \"https://example.com/test.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.3 POST champion as User -> 403",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('permChampionName', 'Perm ' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 403', function () { pm.response.to.have.status(403); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"{{permChampionName}}\",\n  \"title\": \"Permission test\",\n  \"description\": \"Permission test champion\",\n  \"imageUrl\": \"https://example.com/test.png\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.4 PUT admin's comment as User -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 403', function () { pm.response.to.have.status(403); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}/builds/{{buildId}}/comments/{{commentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}",
+                "builds",
+                "{{buildId}}",
+                "comments",
+                "{{commentId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"not my comment\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.5 DELETE admin's build as User -> 403",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 403', function () { pm.response.to.have.status(403); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}/builds/{{buildId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}",
+                "builds",
+                "{{buildId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.6 POST comment as User -> 201, author is faker_fan (saves userCommentId)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });",
+                  "pm.test('Location header is present', function () { pm.expect(pm.response.headers.get('Location')).to.be.a('string').and.not.empty; });",
+                  "pm.test('authorUsername is faker_fan', function () { pm.expect(j.authorUsername).to.eql('faker_fan'); });",
+                  "if (j && j.id) { pm.collectionVariables.set('userCommentId', String(j.id)); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}/builds/{{buildId}}/comments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}",
+                "builds",
+                "{{buildId}}",
+                "comments"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"User comment from Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.7 PUT own comment as User -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });",
+                  "pm.test('Text was updated', function () { pm.expect(j && j.text).to.eql('User comment edited from Postman'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}/builds/{{buildId}}/comments/{{userCommentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}",
+                "builds",
+                "{{buildId}}",
+                "comments",
+                "{{userCommentId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"User comment edited from Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.8 DELETE User's comment as Admin (moderation) -> 204",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/champions/{{championId}}/builds/{{buildId}}/comments/{{userCommentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "champions",
+                "{{championId}}",
+                "builds",
+                "{{buildId}}",
+                "comments",
+                "{{userCommentId}}"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.9 GET /api/auth/me as User -> 200, role User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });",
+                  "pm.test('role is User', function () { pm.expect(j.role).to.eql('User'); });",
+                  "pm.test('username is faker_fan', function () { pm.expect(j.username).to.eql('faker_fan'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.10 GET /api/auth/me with bogus token 'abc.def.ghi' -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 401', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "abc.def.ghi",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.11 Login faker_fan with wrong password -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 401', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"faker_fan\",\n  \"password\": \"WrongPassword!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.12 Register new unique user -> 201",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var u = 'player_' + Date.now();",
+                  "pm.collectionVariables.set('registerUsername', u);",
+                  "pm.collectionVariables.set('registerEmail', u + '@example.com');"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 201', function () { pm.response.to.have.status(201); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });",
+                  "pm.test('accessToken and refreshToken are strings', function () { pm.expect(j.accessToken).to.be.a('string'); pm.expect(j.refreshToken).to.be.a('string'); });",
+                  "pm.test('username matches and role is User', function () { pm.expect(j.user.username).to.eql(pm.collectionVariables.get('registerUsername')); pm.expect(j.user.role).to.eql('User'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{registerUsername}}\",\n  \"email\": \"{{registerEmail}}\",\n  \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.13 Register same username again -> 409",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 409', function () { pm.response.to.have.status(409); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{registerUsername}}\",\n  \"email\": \"{{registerEmail}}\",\n  \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.14 Register with invalid email -> 422",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('badEmailUsername', 'badmail_' + Date.now());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 422', function () { pm.response.to.have.status(422); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{badEmailUsername}}\",\n  \"email\": \"not-an-email\",\n  \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.15 Refresh with current refresh token -> 200 (rotates; saves userRefreshToken2 and userToken)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });",
+                  "pm.test('new refreshToken differs from the old one', function () { pm.expect(j.refreshToken).to.be.a('string'); pm.expect(j.refreshToken).to.not.eql(pm.collectionVariables.get('userRefreshToken')); });",
+                  "if (j && j.accessToken) { pm.collectionVariables.set('userToken', j.accessToken); }",
+                  "if (j && j.refreshToken) { pm.collectionVariables.set('userRefreshToken2', j.refreshToken); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "refresh"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{userRefreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.16 Refresh with OLD refresh token again -> 401 (reuse rejected)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 401', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "refresh"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{userRefreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.17 Login faker_fan again -> 200 (fresh session)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });",
+                  "if (j && j.accessToken) { pm.collectionVariables.set('userToken', j.accessToken); pm.collectionVariables.set('userRefreshToken', j.refreshToken); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"faker_fan\",\n  \"password\": \"Password123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.18 Logout as User -> 204",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 204', function () { pm.response.to.have.status(204); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{userToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.19 Refresh after logout with the refresh token from 5.17 -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 401', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "refresh"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{userRefreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.20 Logout without token -> 401",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var j = null; try { j = pm.response.json(); } catch (e) { j = null; }",
+                  "pm.test('Status is 401', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Content-Type contains json', function () { pm.expect(pm.response.headers.get('Content-Type')).to.include('json'); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6 Cleanup (deletes)",
+      "item": [
+        {
+          "name": "6.1 Delete comment",
           "event": [
             {
               "listen": "test",
@@ -1326,7 +2585,7 @@
           "response": []
         },
         {
-          "name": "5.2 Delete same comment again",
+          "name": "6.2 Delete same comment again",
           "event": [
             {
               "listen": "test",
@@ -1371,7 +2630,7 @@
           "response": []
         },
         {
-          "name": "5.3 Delete build",
+          "name": "6.3 Delete build",
           "event": [
             {
               "listen": "test",
@@ -1411,7 +2670,7 @@
           "response": []
         },
         {
-          "name": "5.4 Delete champion",
+          "name": "6.4 Delete champion",
           "event": [
             {
               "listen": "test",
@@ -1449,7 +2708,7 @@
           "response": []
         },
         {
-          "name": "5.5 Get deleted champion",
+          "name": "6.5 Get deleted champion",
           "event": [
             {
               "listen": "test",

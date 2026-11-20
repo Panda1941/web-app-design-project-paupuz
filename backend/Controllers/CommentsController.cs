@@ -1,6 +1,7 @@
 using LolBuilds.Api.Data;
 using LolBuilds.Api.Dtos;
 using LolBuilds.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -75,8 +76,10 @@ public class CommentsController : ApiControllerBase
         return Ok(Mapping.ToDto(comment, championId));
     }
 
-    /// <summary>Create a comment under a build.</summary>
+    /// <summary>Create a comment under a build. Logged-in users only.</summary>
+    [Authorize]
     [HttpPost]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(typeof(CommentDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -102,8 +105,11 @@ public class CommentsController : ApiControllerBase
             Mapping.ToDto(created, championId));
     }
 
-    /// <summary>Update a comment.</summary>
+    /// <summary>Update a comment. Only its author can do this.</summary>
+    [Authorize]
     [HttpPut("{commentId:int}")]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(CommentDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -113,6 +119,8 @@ public class CommentsController : ApiControllerBase
         Comment? comment = await FindComment(championId, buildId, commentId);
         if (comment == null)
             return NotFoundProblem($"Comment {commentId} was not found for build {buildId} of champion {championId}.");
+        if (!IsOwner(comment.AuthorId))
+            return ForbiddenProblem("You can only edit your own comments.");
 
         comment.Text = request.Text.Trim();
         comment.UpdatedAt = DateTime.UtcNow;
@@ -121,8 +129,11 @@ public class CommentsController : ApiControllerBase
         return Ok(Mapping.ToDto(comment, championId));
     }
 
-    /// <summary>Delete a comment.</summary>
+    /// <summary>Delete a comment. Its author or an admin can do this.</summary>
+    [Authorize]
     [HttpDelete("{commentId:int}")]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int championId, int buildId, int commentId)
@@ -130,6 +141,8 @@ public class CommentsController : ApiControllerBase
         Comment? comment = await FindComment(championId, buildId, commentId);
         if (comment == null)
             return NotFoundProblem($"Comment {commentId} was not found for build {buildId} of champion {championId}.");
+        if (!IsOwner(comment.AuthorId) && !IsAdmin)
+            return ForbiddenProblem("You can only delete your own comments.");
 
         _db.Comments.Remove(comment);
         await _db.SaveChangesAsync();

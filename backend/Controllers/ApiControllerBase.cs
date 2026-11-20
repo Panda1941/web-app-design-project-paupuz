@@ -1,3 +1,4 @@
+using LolBuilds.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LolBuilds.Api.Controllers;
@@ -7,9 +8,15 @@ namespace LolBuilds.Api.Controllers;
 [Produces("application/json")]
 public abstract class ApiControllerBase : ControllerBase
 {
-    // TEMPORARY (lab 1): every write is done as the seeded user "faker_fan" (id 2).
-    // Lab 2 replaces this with the user ID read from the JWT.
-    protected int CurrentUserId => 2;
+    // The logged-in user's ID, read from the "sub" claim of the JWT.
+    // Only use this in [Authorize] actions (there the token is guaranteed to be valid).
+    protected int CurrentUserId => int.Parse(User.FindFirst("sub")!.Value);
+
+    protected bool IsAdmin => User.IsInRole(Roles.Admin);
+
+    // Ownership rule: you can change something only if you wrote it.
+    // Admins can additionally delete anything (moderation), see the controllers.
+    protected bool IsOwner(int authorId) => authorId == CurrentUserId;
 
     // Keeps page numbers sane instead of returning errors for odd values.
     protected static (int page, int pageSize) NormalizePaging(int page, int pageSize)
@@ -46,5 +53,17 @@ public abstract class ApiControllerBase : ControllerBase
     protected ObjectResult ConflictProblem(string message)
     {
         return Problem(statusCode: StatusCodes.Status409Conflict, title: "Conflict", detail: message);
+    }
+
+    // 401: we don't know who you are (no token, bad token, wrong password).
+    protected ObjectResult UnauthorizedProblem(string message)
+    {
+        return Problem(statusCode: StatusCodes.Status401Unauthorized, title: "Unauthorized", detail: message);
+    }
+
+    // 403: we know who you are, but you're not allowed to do this.
+    protected ObjectResult ForbiddenProblem(string message)
+    {
+        return Problem(statusCode: StatusCodes.Status403Forbidden, title: "Forbidden", detail: message);
     }
 }

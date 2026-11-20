@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
     public DbSet<Build> Builds => Set<Build>();
     public DbSet<Comment> Comments => Set<Comment>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     // SQLite doesn't remember that a date is UTC, so mark every DateTime read from the DB as UTC.
     // That way the JSON contains "...Z" and clients convert it to local time correctly.
@@ -53,6 +54,8 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(c => c.AuthorId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<RefreshToken>().HasIndex(t => t.TokenHash).IsUnique();
 
         modelBuilder.Entity<Champion>().HasIndex(c => c.Name).IsUnique();
         modelBuilder.Entity<User>().HasIndex(u => u.Username).IsUnique();

@@ -1,6 +1,7 @@
 using LolBuilds.Api.Data;
 using LolBuilds.Api.Dtos;
 using LolBuilds.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -102,8 +103,11 @@ public class ChampionsController : ApiControllerBase
             buildsPerPosition, latestBuilds, links));
     }
 
-    /// <summary>Create a champion.</summary>
+    /// <summary>Create a champion. Admin only.</summary>
+    [Authorize(Roles = Roles.Admin)]
     [HttpPost]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ChampionDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
@@ -128,8 +132,11 @@ public class ChampionsController : ApiControllerBase
         return CreatedAtAction(nameof(GetOne), new { championId = champion.Id }, Mapping.ToDto(champion));
     }
 
-    /// <summary>Update a champion.</summary>
+    /// <summary>Update a champion. Admin only.</summary>
+    [Authorize(Roles = Roles.Admin)]
     [HttpPut("{championId:int}")]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ChampionDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -154,8 +161,11 @@ public class ChampionsController : ApiControllerBase
         return Ok(Mapping.ToDto(champion));
     }
 
-    /// <summary>Delete a champion, together with its builds and their comments.</summary>
+    /// <summary>Delete a champion, together with its builds and their comments. Admin only.</summary>
+    [Authorize(Roles = Roles.Admin)]
     [HttpDelete("{championId:int}")]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int championId)

@@ -485,3 +485,7 @@ $RECYCLE.BIN/
 *.db
 *.db-shm
 *.db-wal
+
+# Postman app local workspace files
+.postman/
+postman/globals/

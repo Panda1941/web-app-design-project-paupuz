@@ -66,6 +66,19 @@ public class User
     public DateTime CreatedAt { get; set; }
 }
 
+// A refresh token handed out at login. Only its SHA-256 hash is stored, so a stolen database
+// can't be used to log in. Each token is single-use: refreshing revokes it and issues a new one.
+public class RefreshToken
+{
+    public int Id { get; set; }
+    public int UserId { get; set; }
+    public User? User { get; set; }
+    public string TokenHash { get; set; } = "";
+    public DateTime CreatedAt { get; set; }
+    public DateTime ExpiresAt { get; set; }
+    public DateTime? RevokedAt { get; set; }
+}
+
 // Guest = no token. User and Admin are stored on the user and put into the JWT.
 public static class Roles
 {
